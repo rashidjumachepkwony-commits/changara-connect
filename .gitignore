@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Environment variables - never commit secrets
+.env
+.env.local
+
+# Uploaded files
+server/uploads/*
+
+# Logs
+npm-debug.log*
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+.idea/
+
+# MongoDB local data
+data/

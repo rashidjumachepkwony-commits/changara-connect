@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rentals in Changara | Houses, Rooms, Shops &amp; Land for Rent</title>
+  <meta name="description" content="Find houses, rooms, shops, business premises and land for rent in Changara, Teso North, Busia County. Contact landlords by call or WhatsApp.">
+  <link rel="canonical" href="/rentals.html">
+  <meta property="og:title" content="Rentals in Changara - Changara Connect">
+  <meta property="og:description" content="Houses, rooms, shops and land for rent around Changara.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#1668e3">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/images/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="tb-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County</div>
+    <div class="tb-right"><a href="dashboard.html">My Account</a></div>
+  </div>
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+      <a href="index.html" class="brand"><i class="fa-solid fa-link brand-icon"></i><span>Changara Connect<span class="brand-line">Find It. Connect Locally.</span></span></a>
+      <nav aria-label="Main menu" id="mainNav">
+        <ul class="nav-links">
+          <li><a href="index.html" data-nav="index.html">Home</a></li>
+          <li><a href="businesses.html" data-nav="businesses.html">Businesses</a></li>
+          <li><a href="marketplace.html" data-nav="marketplace.html">Marketplace</a></li>
+          <li><a href="jobs.html" data-nav="jobs.html">Jobs</a></li>
+          <li><a href="rentals.html" data-nav="rentals.html">Rentals</a></li>
+          <li><a href="services.html" data-nav="services.html">Services</a></li>
+          <li><a href="notices.html" data-nav="notices.html">Notices</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="hbtn" id="loginBtn">Log in</a>
+        <a href="dashboard.html" class="hbtn primary" id="dashBtn" style="display:none">Account</a>
+      </div>
+    </div>
+  </header>
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-panel" role="dialog" aria-label="Menu">
+      <button class="drawer-close" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+      <div style="color:var(--primary);font-weight:700;margin-bottom:12px"><i class="fa-solid fa-link"></i> Changara Connect</div>
+      <div id="drawerAuth"></div>
+      <hr class="divider">
+      <p class="text-muted">Browse</p>
+      <p><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></p>
+      <p><a href="businesses.html"><i class="fa-solid fa-store"></i> Businesses</a></p>
+      <p><a href="marketplace.html"><i class="fa-solid fa-cart-shopping"></i> Marketplace</a></p>
+      <p><a href="jobs.html"><i class="fa-solid fa-briefcase"></i> Jobs</a></p>
+      <p><a href="rentals.html"><i class="fa-solid fa-house"></i> Rentals</a></p>
+      <p><a href="services.html"><i class="fa-solid fa-wrench"></i> Services</a></p>
+      <p><a href="notices.html"><i class="fa-solid fa-bullhorn"></i> Notices</a></p>
+    </div>
+  </div>
+  <main class="container">
+    <div class="breadcrumb mt-2"><a href="index.html">Home</a> / Rentals</div>
+    <div class="flex-between section-head">
+      <div><h1 class="page-title">Rentals</h1><p class="page-sub" id="rentCount">Loading...</p></div>
+      <button class="btn btn-green" id="openRentForm"><i class="fa-solid fa-plus"></i> List a property</button>
+    </div>
+    <div class="filters mt-2" role="search">
+      <div class="f"><label class="sr-only" for="rSearch">Search rentals</label><input id="rSearch" type="search" placeholder="Search, e.g. bedsitter, shop..."></div>
+      <div class="f"><label class="sr-only" for="rType">Property type</label><select id="rType"><option value="">Any type</option><option>Houses</option><option>Rooms</option><option>Shops</option><option>Business Premises</option><option>Land</option></select></div>
+      <div class="f"><label class="sr-only" for="rSort">Sort</label><select id="rSort"><option value="newest">Newest</option><option value="price_asc">Price: low to high</option><option value="price_desc">Price: high to low</option></select></div>
+      <button class="btn btn-primary" id="applyRent"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </div>
+    <div class="grid grid-auto mt-2" id="rentGrid"></div>
+    <div class="pagination" id="rentPager"></div>
+  </main>
+<!-- ===== RENT_BODY2 ===== -->
+  <footer class="footer">
+    <div class="footer-grid" style="max-width:1200px;margin:0 auto">
+      <div><div class="f-brand"><i class="fa-solid fa-link"></i> Changara Connect</div><p class="f-tag">"Find It. Connect Locally. Grow Together."</p><p class="f-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County, Kenya</p></div>
+      <div><h4>Quick Links</h4><ul><li><a href="businesses.html">Businesses</a></li><li><a href="marketplace.html">Marketplace</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="rentals.html">Rentals</a></li><li><a href="services.html">Services</a></li><li><a href="notices.html">Notices</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="profile.html">About &amp; Contact</a></li><li><a href="profile.html">Terms</a></li><li><a href="profile.html">Privacy</a></li><li><a href="dashboard.html">Report a Problem</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Changara Connect. Find It. Connect Locally. Grow Together.</div>
+  </footer>
+  <nav class="bottom-nav" aria-label="Quick navigation">
+    <a href="index.html" data-nav="index.html"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="businesses.html" data-nav="businesses.html"><i class="fa-solid fa-store"></i>Businesses</a>
+    <a href="marketplace.html" data-nav="marketplace.html" class="bn-add" aria-label="Marketplace"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="jobs.html" data-nav="jobs.html"><i class="fa-solid fa-briefcase"></i>Jobs</a>
+    <a href="services.html" data-nav="services.html"><i class="fa-solid fa-wrench"></i>Services</a>
+  </nav>
+  <div class="spacer"></div>
+
+  <div class="modal" id="rentModal" role="dialog" aria-modal="true" aria-labelledby="rentModalTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="rentModalTitle">Rental details</h3><button class="modal-close" aria-label="Close">&times;</button></div>
+      <div class="modal-body" id="rentDetail"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="postRentModal" role="dialog" aria-modal="true" aria-labelledby="postRentTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="postRentTitle">List a property</h3><button class="modal-close" aria-label="Close">&times;</button></div>
+      <div class="modal-body">
+        <p class="notice-strip"><i class="fa-solid fa-circle-info"></i> Properties are reviewed by an admin before they appear publicly.</p>
+        <form id="rentForm" class="mt-2" enctype="multipart/form-data">
+          <div class="form-group"><label class="form-label" for="rtTitle">Title <span class="req">*</span></label><input class="form-input" id="rtTitle" name="title" required maxlength="120" placeholder="e.g. 2-bedroom house near Changara market"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="rtType">Property type <span class="req">*</span></label><select class="form-select" id="rtType" name="propertyType" required><option value="">Select type *</option><option>Houses</option><option>Rooms</option><option>Shops</option><option>Business Premises</option><option>Land</option></select></div>
+            <div class="form-group"><label class="form-label" for="rtPrice">Monthly price (KSh) <span class="req">*</span></label><input class="form-input" id="rtPrice" name="price" type="number" min="0" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="rtLoc">Location <span class="req">*</span></label><input class="form-input" id="rtLoc" name="location" required></div>
+            <div class="form-group"><label class="form-label" for="rtRooms">Number of rooms</label><input class="form-input" id="rtRooms" name="rooms" type="number" min="0" value="0"></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="rtDesc">Description <span class="req">*</span></label><textarea class="form-textarea" id="rtDesc" name="description" required maxlength="2000"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="rtPhone">Phone <span class="req">*</span></label><input class="form-input" id="rtPhone" name="phone" required inputmode="tel"></div>
+            <div class="form-group"><label class="form-label" for="rtWa">WhatsApp</label><input class="form-input" id="rtWa" name="whatsapp" inputmode="tel"></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="rtImgs">Photos (up to 6)</label><label class="file-input">Choose photos<input type="file" id="rtImgs" name="images" accept="image/jpeg,image/png,image/webp" multiple></label><div class="img-preview" id="rtImgsPrev"></div></div>
+          <p class="form-error" id="rentErr"></p>
+          <button class="btn btn-primary btn-block" type="submit" id="rentSubmit"><i class="fa-solid fa-paper-plane"></i> Submit for review</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/rentals.js"></script>
+</body>
+</html>

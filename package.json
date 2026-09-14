@@ -1,0 +1,40 @@
+{
+  "name": "changara-connect",
+  "version": "1.0.0",
+  "description": "Changara Connect - Find It. Connect Locally. Grow Together. Local marketplace and services platform for Changara, Teso North, Busia County, Kenya.",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "seed": "node server/seed/seed.js",
+    "seed:admin": "node server/seed/seed-admin.js"
+  },
+  "keywords": [
+    "changara",
+    "teso-north",
+    "busia",
+    "kenya",
+    "marketplace",
+    "directory",
+    "services",
+    "local-business"
+  ],
+  "author": "Changara Connect",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.1",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

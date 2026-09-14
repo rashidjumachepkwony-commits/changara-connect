@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile | Changara Connect</title>
+  <meta name="description" content="Manage your Changara Connect profile, account details and password.">
+  <link rel="canonical" href="/profile.html">
+  <meta name="theme-color" content="#1668e3">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/images/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="tb-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County</div>
+    <div class="tb-right"><a href="dashboard.html">My Account</a></div>
+  </div>
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+      <a href="index.html" class="brand"><i class="fa-solid fa-link brand-icon"></i><span>Changara Connect<span class="brand-line">Find It. Connect Locally.</span></span></a>
+      <nav aria-label="Main menu" id="mainNav">
+        <ul class="nav-links">
+          <li><a href="index.html" data-nav="index.html">Home</a></li>
+          <li><a href="businesses.html" data-nav="businesses.html">Businesses</a></li>
+          <li><a href="marketplace.html" data-nav="marketplace.html">Marketplace</a></li>
+          <li><a href="jobs.html" data-nav="jobs.html">Jobs</a></li>
+          <li><a href="rentals.html" data-nav="rentals.html">Rentals</a></li>
+          <li><a href="services.html" data-nav="services.html">Services</a></li>
+          <li><a href="notices.html" data-nav="notices.html">Notices</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="hbtn" id="loginBtn">Log in</a>
+        <a href="dashboard.html" class="hbtn primary" id="dashBtn" style="display:none">Account</a>
+      </div>
+    </div>
+  </header>
+<!-- ===== PROF_MAIN ===== -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-panel" role="dialog" aria-label="Menu">
+      <button class="drawer-close" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+      <div style="color:var(--primary);font-weight:700;margin-bottom:12px"><i class="fa-solid fa-link"></i> Changara Connect</div>
+      <div id="drawerAuth"></div>
+      <hr class="divider">
+      <p class="text-muted">Browse</p>
+      <p><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></p>
+      <p><a href="businesses.html"><i class="fa-solid fa-store"></i> Businesses</a></p>
+      <p><a href="marketplace.html"><i class="fa-solid fa-cart-shopping"></i> Marketplace</a></p>
+      <p><a href="jobs.html"><i class="fa-solid fa-briefcase"></i> Jobs</a></p>
+      <p><a href="rentals.html"><i class="fa-solid fa-house"></i> Rentals</a></p>
+      <p><a href="services.html"><i class="fa-solid fa-wrench"></i> Services</a></p>
+      <p><a href="notices.html"><i class="fa-solid fa-bullhorn"></i> Notices</a></p>
+    </div>
+  </div>
+  <main class="container mt-3">
+    <div class="breadcrumb"><a href="index.html">Home</a> / Profile</div>
+    <div class="flex-between section-head">
+      <div><h1 class="page-title">My Profile</h1><p class="page-sub">Account details, saved items and settings.</p></div>
+      <button class="btn btn-ghost" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+    <div class="grid grid-2 mt-2" style="align-items:start">
+      <form class="form-card" id="profileForm" enctype="multipart/form-data">
+        <h2 class="mb-1">Details</h2>
+        <div class="form-group"><label class="form-label" for="pName">Full name</label><input class="form-input" id="pName" name="name"></div>
+        <div class="form-group"><label class="form-label" for="pPhone">Phone (cannot change)</label><input class="form-input" id="pPhone" disabled></div>
+        <div class="form-group"><label class="form-label" for="pEmail">Email</label><input class="form-input" id="pEmail" name="email" type="email"></div>
+        <div class="form-group"><label class="form-label" for="pLoc">Location</label><input class="form-input" id="pLoc" name="location"></div>
+        <div class="form-group"><label class="form-label" for="pImg">Profile picture</label><label class="file-input">Choose picture<input type="file" id="pImg" name="profileImage" accept="image/jpeg,image/png,image/webp"></label><div class="img-preview" id="pImgPrev"></div></div>
+        <p class="form-error" id="profErr"></p>
+        <button class="btn btn-primary btn-block" type="submit" id="profSubmit"><i class="fa-solid fa-floppy-disk"></i> Save profile</button>
+      </form>
+      <form class="form-card" id="passForm">
+        <h2 class="mb-1">Change password</h2>
+        <div class="form-group"><label class="form-label" for="pCur">Current password</label><input class="form-input" id="pCur" type="password" required></div>
+        <div class="form-group"><label class="form-label" for="pNew">New password (min 6)</label><input class="form-input" id="pNew" type="password" required minlength="6"></div>
+        <p class="form-error" id="passErr"></p>
+        <button class="btn btn-outline btn-block" type="submit" id="passSubmit"><i class="fa-solid fa-key"></i> Update password</button>
+      </form>
+    </div>
+    <section class="section-block">
+      <div class="section-title"><h2>Saved Items</h2></div>
+      <div class="grid grid-auto" id="savedGrid"></div>
+    </section>
+    <div class="spacer"></div>
+  </main>
+<!-- ===== PROF_FOOT ===== -->
+  <footer class="footer">
+    <div class="footer-grid" style="max-width:1200px;margin:0 auto">
+      <div><div class="f-brand"><i class="fa-solid fa-link"></i> Changara Connect</div><p class="f-tag">"Find It. Connect Locally. Grow Together."</p><p class="f-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County, Kenya</p></div>
+      <div><h4>Quick Links</h4><ul><li><a href="businesses.html">Businesses</a></li><li><a href="marketplace.html">Marketplace</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="rentals.html">Rentals</a></li><li><a href="services.html">Services</a></li><li><a href="notices.html">Notices</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="profile.html">About &amp; Contact</a></li><li><a href="profile.html">Terms</a></li><li><a href="profile.html">Privacy</a></li><li><a href="dashboard.html">Report a Problem</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Changara Connect. Find It. Connect Locally. Grow Together.</div>
+  </footer>
+  <nav class="bottom-nav" aria-label="Quick navigation">
+    <a href="index.html" data-nav="index.html"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="businesses.html" data-nav="businesses.html"><i class="fa-solid fa-store"></i>Businesses</a>
+    <a href="marketplace.html" data-nav="marketplace.html" class="bn-add" aria-label="Marketplace"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="jobs.html" data-nav="jobs.html"><i class="fa-solid fa-briefcase"></i>Jobs</a>
+    <a href="services.html" data-nav="services.html"><i class="fa-solid fa-wrench"></i>Services</a>
+  </nav>
+  <div class="spacer"></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => {
+    initShell();
+    if (!Auth.isLoggedIn()) { window.location.href = 'login.html?next=' + encodeURIComponent('profile.html'); return; }
+    const me = Auth.getUser() || {};
+    document.getElementById('pName').value = me.name || '';
+    document.getElementById('pPhone').value = me.phone || '';
+    document.getElementById('pEmail').value = me.email || '';
+    document.getElementById('pLoc').value = me.location || '';
+    document.getElementById('logoutBtn').addEventListener('click', doLogout);
+    bindImagePreview('pImg', 'pImgPrev');
+    document.getElementById('profileForm').addEventListener('submit', saveProfile);
+    document.getElementById('passForm').addEventListener('submit', changePass);
+    loadSaved();
+    async function saveProfile(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('profErr');
+      errEl.classList.remove('show');
+      const btn = document.getElementById('profSubmit');
+      loadingBtn(btn, true);
+      try {
+        const res = await API.putForm('/api/user/profile', new FormData(document.getElementById('profileForm')));
+        Auth.setUser(res.data);
+        refreshAuthShell();
+        toast(res.message || 'Profile updated.', 'success');
+      } catch (err) { errEl.textContent = apiErrorMessage(err); errEl.classList.add('show'); }
+      finally { loadingBtn(btn, false); }
+    }
+    async function changePass(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('passErr');
+      errEl.classList.remove('show');
+      const btn = document.getElementById('passSubmit');
+      loadingBtn(btn, true);
+      try {
+        const res = await API.put('/api/user/profile', { currentPassword: document.getElementById('pCur').value, newPassword: document.getElementById('pNew').value });
+        toast(res.message || 'Password updated.', 'success');
+        document.getElementById('passForm').reset();
+      } catch (err) { errEl.textContent = apiErrorMessage(err); errEl.classList.add('show'); }
+      finally { loadingBtn(btn, false); }
+    }
+    async function loadSaved() {
+      const grid = document.getElementById('savedGrid');
+      grid.innerHTML = skeletonGrid(4);
+      try {
+        const res = await API.get('/api/user/favorites');
+        const g = res.data || {};
+        const cards = [];
+        (g.business || []).forEach((f) => cards.push(renderBusinessCard(f.item)));
+        (g.product || []).forEach((f) => cards.push(renderProductCard(f.item)));
+        (g.job || []).forEach((f) => cards.push(renderJobCard(f.item)));
+        (g.rental || []).forEach((f) => cards.push(renderRentalCard(f.item)));
+        grid.innerHTML = cards.length ? cards.join('') : '<div class="empty-state" style="grid-column:1/-1"><i class="fa-solid fa-bookmark"></i><h3>No saved items yet</h3><p>Tap "Save" on any business, product, job or rental to find it here later.</p></div>';
+      } catch (err) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fa-solid fa-wifi"></i><h3>Could not load saved items</h3><p>' + esc(apiErrorMessage(err)) + '</p></div>';
+      }
+    }
+  });</script>
+</body>
+</html>

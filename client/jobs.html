@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jobs in Changara | Casual, Farm, Construction &amp; Skilled Work</title>
+  <meta name="description" content="Find casual work, farm jobs, construction jobs, shop attendant, teaching, security, driving and technician jobs in Changara, Teso North, Busia County.">
+  <link rel="canonical" href="/jobs.html">
+  <meta property="og:title" content="Jobs in Changara - Changara Connect">
+  <meta property="og:description" content="Find casual, farm and skilled work around Changara.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#1668e3">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/images/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="tb-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County</div>
+    <div class="tb-right"><a href="dashboard.html">My Account</a></div>
+  </div>
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+      <a href="index.html" class="brand"><i class="fa-solid fa-link brand-icon"></i><span>Changara Connect<span class="brand-line">Find It. Connect Locally.</span></span></a>
+      <nav aria-label="Main menu" id="mainNav">
+        <ul class="nav-links">
+          <li><a href="index.html" data-nav="index.html">Home</a></li>
+          <li><a href="businesses.html" data-nav="businesses.html">Businesses</a></li>
+          <li><a href="marketplace.html" data-nav="marketplace.html">Marketplace</a></li>
+          <li><a href="jobs.html" data-nav="jobs.html">Jobs</a></li>
+          <li><a href="rentals.html" data-nav="rentals.html">Rentals</a></li>
+          <li><a href="services.html" data-nav="services.html">Services</a></li>
+          <li><a href="notices.html" data-nav="notices.html">Notices</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="hbtn" id="loginBtn">Log in</a>
+        <a href="dashboard.html" class="hbtn primary" id="dashBtn" style="display:none">Account</a>
+      </div>
+    </div>
+  </header>
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-panel" role="dialog" aria-label="Menu">
+      <button class="drawer-close" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+      <div style="color:var(--primary);font-weight:700;margin-bottom:12px"><i class="fa-solid fa-link"></i> Changara Connect</div>
+      <div id="drawerAuth"></div>
+      <hr class="divider">
+      <p class="text-muted">Browse</p>
+      <p><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></p>
+      <p><a href="businesses.html"><i class="fa-solid fa-store"></i> Businesses</a></p>
+      <p><a href="marketplace.html"><i class="fa-solid fa-cart-shopping"></i> Marketplace</a></p>
+      <p><a href="jobs.html"><i class="fa-solid fa-briefcase"></i> Jobs</a></p>
+      <p><a href="rentals.html"><i class="fa-solid fa-house"></i> Rentals</a></p>
+      <p><a href="services.html"><i class="fa-solid fa-wrench"></i> Services</a></p>
+      <p><a href="notices.html"><i class="fa-solid fa-bullhorn"></i> Notices</a></p>
+    </div>
+  </div>
+  <main class="container">
+    <div class="breadcrumb mt-2"><a href="index.html">Home</a> / Jobs</div>
+    <div class="flex-between section-head">
+      <div><h1 class="page-title">Jobs</h1><p class="page-sub" id="jobCount">Loading...</p></div>
+      <button class="btn btn-green" id="openJobForm"><i class="fa-solid fa-plus"></i> Post a job</button>
+    </div>
+    <div class="filters mt-2" role="search">
+      <div class="f"><label class="sr-only" for="jSearch">Search jobs</label><input id="jSearch" type="search" placeholder="Search, e.g. farm work, driver..."></div>
+      <div class="f"><label class="sr-only" for="jCat">Category</label><select id="jCat"></select></div>
+      <div class="f"><label class="sr-only" for="jPay">Pay type</label><select id="jPay"><option value="">Any pay type</option><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Negotiable</option></select></div>
+      <button class="btn btn-primary" id="applyJobs"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </div>
+    <div class="grid grid-auto mt-2" id="jobGrid"></div>
+    <div class="pagination" id="jobPager"></div>
+  </main>
+<!-- ===== JOBS_BODY2 ===== -->
+  <footer class="footer">
+    <div class="footer-grid" style="max-width:1200px;margin:0 auto">
+      <div><div class="f-brand"><i class="fa-solid fa-link"></i> Changara Connect</div><p class="f-tag">"Find It. Connect Locally. Grow Together."</p><p class="f-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County, Kenya</p></div>
+      <div><h4>Quick Links</h4><ul><li><a href="businesses.html">Businesses</a></li><li><a href="marketplace.html">Marketplace</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="rentals.html">Rentals</a></li><li><a href="services.html">Services</a></li><li><a href="notices.html">Notices</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="profile.html">About &amp; Contact</a></li><li><a href="profile.html">Terms</a></li><li><a href="profile.html">Privacy</a></li><li><a href="dashboard.html">Report a Problem</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Changara Connect. Find It. Connect Locally. Grow Together.</div>
+  </footer>
+  <nav class="bottom-nav" aria-label="Quick navigation">
+    <a href="index.html" data-nav="index.html"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="businesses.html" data-nav="businesses.html"><i class="fa-solid fa-store"></i>Businesses</a>
+    <a href="marketplace.html" data-nav="marketplace.html" class="bn-add" aria-label="Marketplace"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="jobs.html" data-nav="jobs.html"><i class="fa-solid fa-briefcase"></i>Jobs</a>
+    <a href="services.html" data-nav="services.html"><i class="fa-solid fa-wrench"></i>Services</a>
+  </nav>
+  <div class="spacer"></div>
+
+  <div class="modal" id="jobModal" role="dialog" aria-modal="true" aria-labelledby="jobModalTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="jobModalTitle">Job details</h3><button class="modal-close" aria-label="Close">&times;</button></div>
+      <div class="modal-body" id="jobDetail"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="postJobModal" role="dialog" aria-modal="true" aria-labelledby="postJobTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="postJobTitle">Post a job</h3><button class="modal-close" aria-label="Close">&times;</button></div>
+      <div class="modal-body">
+        <p class="notice-strip"><i class="fa-solid fa-circle-info"></i> Jobs are reviewed by an admin before they appear publicly.</p>
+        <form id="jobForm" class="mt-2">
+          <div class="form-group"><label class="form-label" for="jbTitle">Job title <span class="req">*</span></label><input class="form-input" id="jbTitle" name="title" required maxlength="120" placeholder="e.g. Need 2 people for maize harvesting"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="jbEmp">Employer <span class="req">*</span></label><input class="form-input" id="jbEmp" name="employer" required maxlength="120"></div>
+            <div class="form-group"><label class="form-label" for="jbCat">Category <span class="req">*</span></label><select class="form-select" id="jbCat" name="category" required></select></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="jbDesc">Description <span class="req">*</span></label><textarea class="form-textarea" id="jbDesc" name="description" required maxlength="2000"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="jbLoc">Location <span class="req">*</span></label><input class="form-input" id="jbLoc" name="location" required placeholder="e.g. Angurai"></div>
+            <div class="form-group"><label class="form-label" for="jbSalary">Pay amount (KSh, 0 = negotiable)</label><input class="form-input" id="jbSalary" name="salary" type="number" min="0" value="0"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="jbType">Pay type</label><select class="form-select" id="jbType" name="salaryType"><option>Negotiable</option><option>Daily</option><option>Weekly</option><option>Monthly</option></select></div>
+            <div class="form-group"><label class="form-label" for="jbPhone">Phone <span class="req">*</span></label><input class="form-input" id="jbPhone" name="phone" required inputmode="tel"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="jbWa">WhatsApp</label><input class="form-input" id="jbWa" name="whatsapp" inputmode="tel"></div>
+            <div class="form-group"><label class="form-label" for="jbClose">Closing date</label><input class="form-input" id="jbClose" name="closingDate" type="date"></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="jbHow">How to apply</label><textarea class="form-textarea" id="jbHow" name="applicationInstructions" maxlength="1000" placeholder="e.g. Call the number above or visit our shop"></textarea></div>
+          <p class="form-error" id="jobErr"></p>
+          <button class="btn btn-primary btn-block" type="submit" id="jobSubmit"><i class="fa-solid fa-paper-plane"></i> Submit for review</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/jobs.js"></script>
+</body>
+</html>

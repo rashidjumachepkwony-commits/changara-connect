@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Businesses in Changara | Electronics, Phone Shops, Hardware, Agrovets &amp; More</title>
+  <meta name="description" content="Browse trusted local businesses in Changara, Teso North: electronics, phone shops, computer services, hardware, agrovets, restaurants, salons, welders, electricians, plumbers, transport and more. Call or WhatsApp them directly.">
+  <link rel="canonical" href="/businesses.html">
+  <meta property="og:title" content="Business Directory - Changara Connect">
+  <meta property="og:description" content="Find trusted local businesses around Changara. Call or WhatsApp them directly.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#1668e3">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/images/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="tb-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County</div>
+    <div class="tb-right"><a href="dashboard.html">My Account</a></div>
+  </div>
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+      <a href="index.html" class="brand"><i class="fa-solid fa-link brand-icon"></i><span>Changara Connect<span class="brand-line">Find It. Connect Locally.</span></span></a>
+      <nav aria-label="Main menu" id="mainNav">
+        <ul class="nav-links">
+          <li><a href="index.html" data-nav="index.html">Home</a></li>
+          <li><a href="businesses.html" data-nav="businesses.html">Businesses</a></li>
+          <li><a href="marketplace.html" data-nav="marketplace.html">Marketplace</a></li>
+          <li><a href="jobs.html" data-nav="jobs.html">Jobs</a></li>
+          <li><a href="rentals.html" data-nav="rentals.html">Rentals</a></li>
+          <li><a href="services.html" data-nav="services.html">Services</a></li>
+          <li><a href="notices.html" data-nav="notices.html">Notices</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="hbtn" id="loginBtn">Log in</a>
+        <a href="dashboard.html" class="hbtn primary" id="dashBtn" style="display:none">Account</a>
+      </div>
+    </div>
+  </header>
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-panel" role="dialog" aria-label="Menu">
+      <button class="drawer-close" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+      <div style="color:var(--primary);font-weight:700;margin-bottom:12px"><i class="fa-solid fa-link"></i> Changara Connect</div>
+      <div id="drawerAuth"></div>
+      <hr class="divider">
+      <p class="text-muted">Browse</p>
+      <p><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></p>
+      <p><a href="businesses.html"><i class="fa-solid fa-store"></i> Businesses</a></p>
+      <p><a href="marketplace.html"><i class="fa-solid fa-cart-shopping"></i> Marketplace</a></p>
+      <p><a href="jobs.html"><i class="fa-solid fa-briefcase"></i> Jobs</a></p>
+      <p><a href="rentals.html"><i class="fa-solid fa-house"></i> Rentals</a></p>
+      <p><a href="services.html"><i class="fa-solid fa-wrench"></i> Services</a></p>
+      <p><a href="notices.html"><i class="fa-solid fa-bullhorn"></i> Notices</a></p>
+    </div>
+  </div>
+  <main class="container">
+    <div class="breadcrumb mt-2"><a href="index.html">Home</a> / Businesses</div>
+    <div class="flex-between section-head">
+      <div><h1 class="page-title">Businesses in Changara</h1><p class="page-sub" id="bizCount">Loading...</p></div>
+      <button class="btn btn-green" id="openBizForm"><i class="fa-solid fa-plus"></i> List your business</button>
+    </div>
+    <div class="filters mt-2" role="search">
+      <div class="f"><label class="sr-only" for="fSearch">Search businesses</label><input id="fSearch" type="search" placeholder="Search businesses..."></div>
+      <div class="f"><label class="sr-only" for="fCat">Category</label><select id="fCat"></select></div>
+      <div class="f"><label class="sr-only" for="fLoc">Location</label><input id="fLoc" type="text" placeholder="Location, e.g. Changara"></div>
+      <div class="f"><label class="sr-only" for="fSort">Sort</label><select id="fSort"><option value="featured">Featured first</option><option value="newest">Newest</option><option value="name">Name A-Z</option></select></div>
+      <button class="btn btn-primary" id="applyFilters"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </div>
+    <div class="grid grid-auto mt-2" id="bizGrid"></div>
+    <div class="pagination" id="bizPager"></div>
+  </main>
+<!-- ===== BIZ_BODY2 ===== -->
+  <footer class="footer">
+    <div class="footer-grid" style="max-width:1200px;margin:0 auto">
+      <div><div class="f-brand"><i class="fa-solid fa-link"></i> Changara Connect</div><p class="f-tag">"Find It. Connect Locally. Grow Together."</p><p class="f-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County, Kenya</p></div>
+      <div><h4>Quick Links</h4><ul><li><a href="businesses.html">Businesses</a></li><li><a href="marketplace.html">Marketplace</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="rentals.html">Rentals</a></li><li><a href="services.html">Services</a></li><li><a href="notices.html">Notices</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="profile.html">About &amp; Contact</a></li><li><a href="profile.html">Terms</a></li><li><a href="profile.html">Privacy</a></li><li><a href="dashboard.html">Report a Problem</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Changara Connect. Find It. Connect Locally. Grow Together.</div>
+  </footer>
+  <nav class="bottom-nav" aria-label="Quick navigation">
+    <a href="index.html" data-nav="index.html"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="businesses.html" data-nav="businesses.html"><i class="fa-solid fa-store"></i>Businesses</a>
+    <a href="marketplace.html" data-nav="marketplace.html" class="bn-add" aria-label="Marketplace"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="jobs.html" data-nav="jobs.html"><i class="fa-solid fa-briefcase"></i>Jobs</a>
+    <a href="services.html" data-nav="services.html"><i class="fa-solid fa-wrench"></i>Services</a>
+  </nav>
+  <div class="spacer"></div>
+
+  <div class="modal" id="bizModal" role="dialog" aria-modal="true" aria-labelledby="bizModalTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="bizModalTitle">List your business</h3><button class="modal-close" aria-label="Close">&times;</button></div>
+      <div class="modal-body">
+        <p class="notice-strip"><i class="fa-solid fa-circle-info"></i> New listings are reviewed by an admin before they appear publicly.</p>
+        <form id="bizForm" class="mt-2" enctype="multipart/form-data">
+          <div class="form-group"><label class="form-label" for="bName">Business name <span class="req">*</span></label><input class="form-input" id="bName" name="name" required maxlength="120"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bCat">Category <span class="req">*</span></label><select class="form-select" id="bCat" name="category" required></select></div>
+            <div class="form-group"><label class="form-label" for="bSub">Subcategory</label><input class="form-input" id="bSub" name="subcategory" maxlength="80"></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="bDesc">Description <span class="req">*</span></label><textarea class="form-textarea" id="bDesc" name="description" required maxlength="2000"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bPhone">Phone (Kenyan) <span class="req">*</span></label><input class="form-input" id="bPhone" name="phone" required inputmode="tel" placeholder="0712345678"></div>
+            <div class="form-group"><label class="form-label" for="bWa">WhatsApp number</label><input class="form-input" id="bWa" name="whatsapp" inputmode="tel" placeholder="0712345678"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bLoc">Location <span class="req">*</span></label><input class="form-input" id="bLoc" name="location" required placeholder="e.g. Changara town"></div>
+            <div class="form-group"><label class="form-label" for="bVil">Village / area</label><input class="form-input" id="bVil" name="village" placeholder="e.g. Kocholia"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bEmail">Email</label><input class="form-input" id="bEmail" name="email" type="email"></div>
+            <div class="form-group"><label class="form-label" for="bHours">Opening hours</label><input class="form-input" id="bHours" name="openingHours" placeholder="Mon-Sat 8am-6pm"></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="bSvc">Services offered (comma separated)</label><input class="form-input" id="bSvc" name="services" placeholder="Screen replacement, charging ports, accessories"></div>
+          <div class="form-group"><label class="form-label" for="bLogo">Business logo (JPG/PNG/WEBP, max 5MB)</label><label class="file-input">Choose logo<input type="file" id="bLogo" name="logo" accept="image/jpeg,image/png,image/webp"></label><div class="img-preview" id="bLogoPrev"></div></div>
+          <div class="form-group"><label class="form-label" for="bImgs">Business photos (up to 6)</label><label class="file-input">Choose photos<input type="file" id="bImgs" name="images" accept="image/jpeg,image/png,image/webp" multiple></label><div class="img-preview" id="bImgsPrev"></div></div>
+          <p class="form-error" id="bizErr"></p>
+          <button class="btn btn-primary btn-block" type="submit" id="bizSubmit"><i class="fa-solid fa-paper-plane"></i> Submit for review</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/businesses.js"></script>
+</body>
+</html>

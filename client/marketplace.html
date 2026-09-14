@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace in Changara | Buy &amp; Sell Phones, Furniture, Produce &amp; More</title>
+  <meta name="description" content="Buy and sell in Changara, Teso North: phones, electronics, furniture, clothing, farm produce, livestock, motorcycles, vehicles and building materials. Contact sellers by call or WhatsApp.">
+  <link rel="canonical" href="/marketplace.html">
+  <meta property="og:title" content="Marketplace - Changara Connect">
+  <meta property="og:description" content="Buy and sell locally in Changara. Phones, furniture, produce, livestock and more.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#1668e3">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/images/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="tb-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County</div>
+    <div class="tb-right"><a href="dashboard.html">My Account</a></div>
+  </div>
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+      <a href="index.html" class="brand"><i class="fa-solid fa-link brand-icon"></i><span>Changara Connect<span class="brand-line">Find It. Connect Locally.</span></span></a>
+      <nav aria-label="Main menu" id="mainNav">
+        <ul class="nav-links">
+          <li><a href="index.html" data-nav="index.html">Home</a></li>
+          <li><a href="businesses.html" data-nav="businesses.html">Businesses</a></li>
+          <li><a href="marketplace.html" data-nav="marketplace.html">Marketplace</a></li>
+          <li><a href="jobs.html" data-nav="jobs.html">Jobs</a></li>
+          <li><a href="rentals.html" data-nav="rentals.html">Rentals</a></li>
+          <li><a href="services.html" data-nav="services.html">Services</a></li>
+          <li><a href="notices.html" data-nav="notices.html">Notices</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="hbtn" id="loginBtn">Log in</a>
+        <a href="dashboard.html" class="hbtn primary" id="dashBtn" style="display:none">Account</a>
+      </div>
+    </div>
+  </header>
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-panel" role="dialog" aria-label="Menu">
+      <button class="drawer-close" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+      <div style="color:var(--primary);font-weight:700;margin-bottom:12px"><i class="fa-solid fa-link"></i> Changara Connect</div>
+      <div id="drawerAuth"></div>
+      <hr class="divider">
+      <p class="text-muted">Browse</p>
+      <p><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></p>
+      <p><a href="businesses.html"><i class="fa-solid fa-store"></i> Businesses</a></p>
+      <p><a href="marketplace.html"><i class="fa-solid fa-cart-shopping"></i> Marketplace</a></p>
+      <p><a href="jobs.html"><i class="fa-solid fa-briefcase"></i> Jobs</a></p>
+      <p><a href="rentals.html"><i class="fa-solid fa-house"></i> Rentals</a></p>
+      <p><a href="services.html"><i class="fa-solid fa-wrench"></i> Services</a></p>
+      <p><a href="notices.html"><i class="fa-solid fa-bullhorn"></i> Notices</a></p>
+    </div>
+  </div>
+  <main class="container">
+    <div class="breadcrumb mt-2"><a href="index.html">Home</a> / Marketplace</div>
+    <div class="flex-between section-head">
+      <div><h1 class="page-title">Marketplace</h1><p class="page-sub" id="prodCount">Loading...</p></div>
+      <button class="btn btn-green" id="openProdForm"><i class="fa-solid fa-plus"></i> Sell an item</button>
+    </div>
+    <div class="filters mt-2" role="search">
+      <div class="f"><label class="sr-only" for="pSearch">Search products</label><input id="pSearch" type="search" placeholder="Search, e.g. Samsung, sofa, maize..."></div>
+      <div class="f"><label class="sr-only" for="pCat">Category</label><select id="pCat"></select></div>
+      <div class="f"><label class="sr-only" for="pCond">Condition</label><select id="pCond"><option value="">Any condition</option><option>New</option><option>Used</option></select></div>
+      <div class="f"><label class="sr-only" for="pSort">Sort</label><select id="pSort"><option value="featured">Featured first</option><option value="newest">Newest</option><option value="price_asc">Price: low to high</option><option value="price_desc">Price: high to low</option></select></div>
+      <button class="btn btn-primary" id="applyProd"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </div>
+    <div class="grid grid-auto mt-2" id="prodGrid"></div>
+    <div class="pagination" id="prodPager"></div>
+  </main>
+<!-- ===== PROD_BODY2 ===== -->
+  <footer class="footer">
+    <div class="footer-grid" style="max-width:1200px;margin:0 auto">
+      <div><div class="f-brand"><i class="fa-solid fa-link"></i> Changara Connect</div><p class="f-tag">"Find It. Connect Locally. Grow Together."</p><p class="f-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County, Kenya</p></div>
+      <div><h4>Quick Links</h4><ul><li><a href="businesses.html">Businesses</a></li><li><a href="marketplace.html">Marketplace</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="rentals.html">Rentals</a></li><li><a href="services.html">Services</a></li><li><a href="notices.html">Notices</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="profile.html">About &amp; Contact</a></li><li><a href="profile.html">Terms</a></li><li><a href="profile.html">Privacy</a></li><li><a href="dashboard.html">Report a Problem</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Changara Connect. Find It. Connect Locally. Grow Together.</div>
+  </footer>
+  <nav class="bottom-nav" aria-label="Quick navigation">
+    <a href="index.html" data-nav="index.html"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="businesses.html" data-nav="businesses.html"><i class="fa-solid fa-store"></i>Businesses</a>
+    <a href="marketplace.html" data-nav="marketplace.html" class="bn-add" aria-label="Marketplace"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="jobs.html" data-nav="jobs.html"><i class="fa-solid fa-briefcase"></i>Jobs</a>
+    <a href="services.html" data-nav="services.html"><i class="fa-solid fa-wrench"></i>Services</a>
+  </nav>
+  <div class="spacer"></div>
+
+  <div class="modal" id="prodModal" role="dialog" aria-modal="true" aria-labelledby="prodTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="prodTitle">Product details</h3><button class="modal-close" aria-label="Close">&times;</button></div>
+      <div class="modal-body" id="prodDetail"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="sellModal" role="dialog" aria-modal="true" aria-labelledby="sellTitle">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="sellTitle">Sell an item</h3><button class="modal-close" aria-label="Close">&times;</button></div>
+      <div class="modal-body">
+        <p class="notice-strip"><i class="fa-solid fa-circle-info"></i> Listings are reviewed by an admin before they appear publicly.</p>
+        <form id="sellForm" class="mt-2" enctype="multipart/form-data">
+          <div class="form-group"><label class="form-label" for="sTitle">Product title <span class="req">*</span></label><input class="form-input" id="sTitle" name="title" required maxlength="120" placeholder="e.g. Samsung Galaxy A13, 64GB"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="sCat">Category <span class="req">*</span></label><select class="form-select" id="sCat" name="category" required></select></div>
+            <div class="form-group"><label class="form-label" for="sCond">Condition <span class="req">*</span></label><select class="form-select" id="sCond" name="condition"><option>Used</option><option>New</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="sPrice">Price (KSh) <span class="req">*</span></label><input class="form-input" id="sPrice" name="price" type="number" min="0" required></div>
+            <div class="form-group"><label class="check-inline" style="margin-top:26px"><input type="checkbox" id="sNeg" name="negotiable" value="true"> Price negotiable</label></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="sDesc">Description <span class="req">*</span></label><textarea class="form-textarea" id="sDesc" name="description" required maxlength="2000"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="sLoc">Location <span class="req">*</span></label><input class="form-input" id="sLoc" name="location" required placeholder="e.g. Changara town"></div>
+            <div class="form-group"><label class="form-label" for="sPhone">Phone <span class="req">*</span></label><input class="form-input" id="sPhone" name="phone" required inputmode="tel"></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="sWa">WhatsApp number</label><input class="form-input" id="sWa" name="whatsapp" inputmode="tel"></div>
+          <div class="form-group"><label class="form-label" for="sImgs">Photos (up to 6, JPG/PNG/WEBP, max 5MB each)</label><label class="file-input">Choose photos<input type="file" id="sImgs" name="images" accept="image/jpeg,image/png,image/webp" multiple></label><div class="img-preview" id="sImgsPrev"></div></div>
+          <p class="form-error" id="sellErr"></p>
+          <button class="btn btn-primary btn-block" type="submit" id="sellSubmit"><i class="fa-solid fa-paper-plane"></i> Submit for review</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/marketplace.js"></script>
+</body>
+</html>

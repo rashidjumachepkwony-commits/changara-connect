@@ -1,0 +1,20 @@
+{
+  "name": "Changara Connect - Find It. Connect Locally. Grow Together.",
+  "short_name": "Changara",
+  "description": "Discover local businesses, services, products, jobs, rentals and notices in Changara, Teso North, Busia County, Kenya.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e2a47",
+  "theme_color": "#1668e3",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/assets/images/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
