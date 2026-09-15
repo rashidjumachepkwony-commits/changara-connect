@@ -209,6 +209,8 @@ changara-connect/
 
   client/
     index.html
+    about.html
+    contact.html
     businesses.html
     business-details.html
     marketplace.html
@@ -253,17 +255,19 @@ changara-connect/
 
 ## Features
 
-### Public features
+  ### Public features
 
-- Homepage hero search bar
-- **I NEED SOMETHING** quick category picker with real results
-- Business directory with categories, featured-first sorting, search, and filters
-- Business detail pages with CALL and WHATSAPP buttons, favorites, and report actions
-- Marketplace, Jobs, Rentals, Services, Farm Services, Transport, and Notices sections
-- Combined search across businesses, products, jobs, rentals, services, and notices
-- Pagination, empty states, loading states, and friendly error messages
-- PWA that can be installed on Android phones
-- Mobile-first layout optimized for low-end devices and slower connections
+  - Homepage hero search bar
+  - **I NEED SOMETHING** quick category picker with real results
+  - Business directory with categories, featured-first sorting, search, and filters
+  - Business detail pages with CALL and WHATSAPP buttons, favorites, and report actions
+  - Marketplace, Jobs, Rentals, Services, Farm Services, Transport, and Notices sections
+  - Combined search across businesses, products, jobs, rentals, services, and notices
+  - Pagination, empty states, loading states, and friendly error messages
+  - Contact page with form submission
+  - About Us, Privacy Policy, and Terms of Service pages
+  - PWA that can be installed on Android phones
+  - Mobile-first layout optimized for low-end devices and slower connections
 
 ### User features
 

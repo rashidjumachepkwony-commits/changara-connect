@@ -3,6 +3,8 @@ const CACHE_NAME = 'changara-connect-v1';
 const CORE_ASSETS = [
   '/',
   '/index.html',
+  '/about.html',
+  '/contact.html',
   '/businesses.html',
   '/marketplace.html',
   '/jobs.html',
@@ -13,6 +15,8 @@ const CORE_ASSETS = [
   '/register.html',
   '/dashboard.html',
   '/profile.html',
+  '/privacy.html',
+  '/terms.html',
   '/css/style.css',
   '/css/responsive.css',
   '/css/admin.css',

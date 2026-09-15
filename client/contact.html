@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Changara Connect</title>
+  <meta name="description" content="Get in touch with Changara Connect. Reach out for support, partnerships, business inquiries, or community questions in Changara, Teso North, Busia County, Kenya.">
+  <link rel="canonical" href="/contact.html">
+  <meta property="og:title" content="Contact Us - Changara Connect">
+  <meta property="og:description" content="Reach out to Changara Connect for support, partnerships, or business inquiries.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#1668e3">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/images/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="tb-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County</div>
+    <div class="tb-right"><a href="dashboard.html">My Account</a></div>
+  </div>
+  <header class="header">
+    <div class="header-inner">
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+      <a href="index.html" class="brand"><i class="fa-solid fa-link brand-icon"></i><span>Changara Connect<span class="brand-line">Find It. Connect Locally.</span></span></a>
+      <nav aria-label="Main menu" id="mainNav">
+        <ul class="nav-links">
+          <li><a href="index.html" data-nav="index.html">Home</a></li>
+          <li><a href="businesses.html">Businesses</a></li>
+          <li><a href="marketplace.html">Marketplace</a></li>
+          <li><a href="jobs.html">Jobs</a></li>
+          <li><a href="rentals.html">Rentals</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="notices.html">Notices</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" class="hbtn" id="loginBtn">Log in</a>
+        <a href="dashboard.html" class="hbtn primary" id="dashBtn" style="display:none">Account</a>
+      </div>
+    </div>
+  </header>
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-panel" role="dialog" aria-label="Menu">
+      <button class="drawer-close" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+      <div style="color:var(--primary);font-weight:700;margin-bottom:12px"><i class="fa-solid fa-link"></i> Changara Connect</div>
+      <div id="drawerAuth"></div>
+      <hr class="divider">
+      <p class="text-muted">Browse</p>
+      <p><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></p>
+      <p><a href="businesses.html"><i class="fa-solid fa-store"></i> Businesses</a></p>
+      <p><a href="marketplace.html"><i class="fa-solid fa-cart-shopping"></i> Marketplace</a></p>
+      <p><a href="jobs.html"><i class="fa-solid fa-briefcase"></i> Jobs</a></p>
+      <p><a href="rentals.html"><i class="fa-solid fa-house"></i> Rentals</a></p>
+      <p><a href="services.html"><i class="fa-solid fa-wrench"></i> Services</a></p>
+      <p><a href="notices.html"><i class="fa-solid fa-bullhorn"></i> Notices</a></p>
+    </div>
+  </div>
+  <div class="about-hero mt-2">
+      <div class="container">
+        <h1>Contact Us</h1>
+        <p>Have a question or partnership idea? We would love to hear from you.</p>
+</div>
+  </div>
+  <main class="container mt-3">
+  <div class="breadcrumb"><a href="index.html">Home</a> / Contact</div>
+    <div class="flex-between section-head">
+      <div><h1 class="page-title">Contact Us</h1><p class="page-sub">Send us a message</p></div>
+    </div>
+    <div class="contact-grid mt-2">
+      <form class="form-card" id="contactForm">
+        <h2 class="mb-1">Send a message</h2>
+        <div class="form-group"><label class="form-label" for="cName">Full name <span class="req">*</span></label><input class="form-input" id="cName" name="name" required autocomplete="name"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" for="cEmail">Email</label><input class="form-input" id="cEmail" name="email" type="email" autocomplete="email"></div>
+          <div class="form-group"><label class="form-label" for="cPhone">Phone</label><input class="form-input" id="cPhone" name="phone" inputmode="tel" placeholder="0712345678"></div>
+        </div>
+        <div class="form-group"><label class="form-label" for="cSubject">Subject</label><input class="form-input" id="cSubject" name="subject" placeholder="How can we help?"></div>
+        <div class="form-group"><label class="form-label" for="cMessage">Message <span class="req">*</span></label><textarea class="form-textarea" id="cMessage" name="message" required maxlength="2000" placeholder="Tell us how we can help..."></textarea></div>
+        <p class="form-error" id="contactErr"></p>
+        <button class="btn btn-primary btn-block" type="submit" id="contactSubmit"><i class="fa-solid fa-paper-plane"></i> Send message</button>
+      </form>
+      <div>
+        <div class="card"><div class="card-body">
+          <h3 class="mb-1"><i class="fa-solid fa-location-dot" style="color:var(--primary)"></i> Address</h3>
+          <p class="text-muted">Changara, Teso North,<br>Busia County, Kenya</p>
+        </div></div>
+        <div class="card mt-2"><div class="card-body">
+          <h3 class="mb-1"><i class="fa-solid fa-phone" style="color:var(--primary)"></i> Phone</h3>
+          <p class="text-muted">Call or WhatsApp us anytime.</p>
+        </div></div>
+        <div class="card mt-2"><div class="card-body">
+          <h3 class="mb-1"><i class="fa-solid fa-envelope" style="color:var(--primary)"></i> Email</h3>
+          <p class="text-muted">info@changaraconnect.co.ke</p>
+        </div></div>
+        <div class="card mt-2"><div class="card-body">
+          <h3 class="mb-1"><i class="fa-solid fa-clock" style="color:var(--primary)"></i> Hours</h3>
+          <p class="text-muted">Monday – Saturday<br>8:00 AM – 6:00 PM</p>
+        </div></div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+  </main>
+  <footer class="footer">
+    <div class="footer-grid" style="max-width:1200px;margin:0 auto">
+      <div><div class="f-brand"><i class="fa-solid fa-link"></i> Changara Connect</div><p class="f-tag">"Find It. Connect Locally. Grow Together."</p><p class="f-loc"><i class="fa-solid fa-location-dot"></i> Changara, Teso North, Busia County, Kenya</p></div>
+      <div><h4>Quick Links</h4><ul><li><a href="businesses.html">Businesses</a></li><li><a href="marketplace.html">Marketplace</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="rentals.html">Rentals</a></li><li><a href="services.html">Services</a></li><li><a href="notices.html">Notices</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="about.html">About &amp; Contact</a></li><li><a href="privacy.html">Terms</a></li><li><a href="contact.html">Privacy</a></li><li><a href="dashboard.html">Report a Problem</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Changara Connect. Find It. Connect Locally. Grow Together.</div>
+  </footer>
+  <nav class="bottom-nav" aria-label="Quick navigation">
+    <a href="index.html" data-nav="index.html"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="businesses.html" data-nav="businesses.html"><i class="fa-solid fa-store"></i>Businesses</a>
+    <a href="marketplace.html" data-nav="marketplace.html" class="bn-add" aria-label="Marketplace"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="jobs.html" data-nav="jobs.html"><i class="fa-solid fa-briefcase"></i>Jobs</a>
+    <a href="services.html" data-nav="services.html"><i class="fa-solid fa-wrench"></i>Services</a>
+  </nav>
+  <div class="spacer"></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => {
+    initShell();
+    const form = document.getElementById('contactForm');
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errEl = document.getElementById('contactErr');
+        errEl.classList.remove('show');
+        const btn = document.getElementById('contactSubmit');
+        loadingBtn(btn, true);
+        try {
+          const res = await API.post('/api/contact', {
+            name: document.getElementById('cName').value.trim(),
+            email: document.getElementById('cEmail').value.trim(),
+            phone: document.getElementById('cPhone').value.trim(),
+            subject: document.getElementById('cSubject').value.trim(),
+            message: document.getElementById('cMessage').value.trim()
+          });
+          toast(res.message || 'Message sent successfully.', 'success');
+          form.reset();
+        } catch (err) {
+          errEl.textContent = apiErrorMessage(err);
+          errEl.classList.add('show');
+        } finally { loadingBtn(btn, false); }
+      });
+    }
+  });</script>
+</body>
+</html>
