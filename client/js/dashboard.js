@@ -71,21 +71,34 @@ document.addEventListener('DOMContentLoaded', () => {
       b.addEventListener('click', () => {
         section = b.getAttribute('data-tab');
         nav.querySelectorAll('[data-tab]').forEach((x) => x.classList.toggle('active', x === b));
-          const nextUrl = new URL(window.location.href);
-          nextUrl.searchParams.set('s', section);
-          window.history.replaceState({}, '', nextUrl);
-          showSection(me);
-        })
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set('s', section);
+        window.history.pushState({}, '', nextUrl);
+        showSection(me);
+      })
     );
+    window.addEventListener('popstate', () => {
+      const selected = new URLSearchParams(window.location.search).get('s');
+      if (!tabs.some((tab) => tab.k === selected)) return;
+      section = selected;
+      nav.querySelectorAll('[data-tab]').forEach((button) => button.classList.toggle('active', button.dataset.tab === section));
+      showSection(me);
+    });
   }
 
   async function countPending(me) {
     try {
       const res = await API.get('/api/admin/pending');
-      if (res.success && res.data.total > 0) {
-        me._pendingCount = res.data.total;
+      if (res.success) {
+        me._pendingCount = res.data.total || 0;
         const btn = nav.querySelector('[data-tab="pending"]');
-        if (btn && !btn.querySelector('.nav-badge')) btn.insertAdjacentHTML('beforeend', '<span class="nav-badge">' + res.data.total + '</span>');
+        const badge = btn && btn.querySelector('.nav-badge');
+        if (me._pendingCount > 0) {
+          if (badge) badge.textContent = me._pendingCount;
+          else if (btn) btn.insertAdjacentHTML('beforeend', '<span class="nav-badge">' + me._pendingCount + '</span>');
+        } else if (badge) {
+          badge.remove();
+        }
       }
     } catch (e) { /* ignore */ }
   }
@@ -337,6 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const MOD_LABEL = { businesses: 'Business', products: 'Product', jobs: 'Job', rentals: 'Rental', notices: 'Notice' };
+  const MOD_PLURAL = { businesses: 'Businesses', products: 'Products', jobs: 'Jobs', rentals: 'Rentals', notices: 'Notices' };
   const MOD_API = { businesses: 'businesses', products: 'products', jobs: 'jobs', rentals: 'rentals', notices: 'notices' };
   const MOD_OWNER = { businesses: 'owner', products: 'seller', jobs: 'poster', rentals: 'owner', notices: 'author' };
 
@@ -352,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const secHtml = (type, items) => {
         if (!items || !items.length) return '';
         const rows = items.map((i) => pendingRow(type, i)).join('');
-        return '<h3 class="mt-2">' + MOD_LABEL[type] + 's (' + items.length + ')</h3><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Title</th><th>Owner</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+        return '<h3 class="mt-2">' + MOD_PLURAL[type] + ' (' + items.length + ')</h3><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Title</th><th>Owner</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
       };
       body.innerHTML =
         '<div class="stat-grid">' + stat('Waiting for review', d.total, 'across all sections') + '</div>' +
@@ -383,6 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let modStatus = 'ALL';
   async function adminListings(type) {
+    modStatus = 'ALL';
     body.innerHTML =
       '<div class="dash-tabs">' + ['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'SUSPENDED'].map((s) => '<button data-st="' + s + '" class="' + (modStatus === s ? 'active' : '') + '">' + s + '</button>').join('') + '</div>' +
       '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Title</th><th>Status</th><th></th></tr></thead><tbody id="modRows"><tr><td colspan="3">Loading...</td></tr></tbody></table></div>';
@@ -398,7 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const res = await API.get('/api/admin/' + MOD_API[t] + '?status=' + modStatus);
         const items = res.data || [];
-        if (!items.length) { rows.innerHTML = '<tr><td colspan="3">No ' + MOD_LABEL[t].toLowerCase() + 's in this state.</td></tr>'; return; }
+        if (!items.length) { rows.innerHTML = '<tr><td colspan="3">No ' + MOD_PLURAL[t].toLowerCase() + ' in this state.</td></tr>'; return; }
         rows.innerHTML = items.map((i) => {
           const title = esc(i.name || i.title);
           return '<tr><td>' + title + '<br><small class="text-muted">' + esc(i.category || i.propertyType || '') + '</small></td><td>' + statusDot(i.status) + '</td><td><span class="actions">' +
@@ -501,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
         res.data.forEach((c) => { (byType[c.type] = byType[c.type] || []).push(c); });
         box.innerHTML = Object.keys(byType).sort().map((t) =>
           '<h3 class="mt-2" style="text-transform:capitalize">' + esc(t) + '</h3>' +
-          '<p style="display:flex;flex-wrap:wrap;gap:6px">' + byType[t].map((c) => '<span class="pill">' + esc(c.name) + ' <a href="#" data-delcat="' + c._id + '" style="color:var(--danger);margin-left:4px">&times;</a></span>').join('') + '</p>'
+          '<p style="display:flex;flex-wrap:wrap;gap:6px">' +           byType[t].map((c) => '<span class="pill">' + esc(c.name) + ' <button type="button" class="btn btn-sm btn-ghost" data-editcat="' + c._id + '" data-name="' + esc(c.name) + '" aria-label="Rename ' + esc(c.name) + '"><i class="fa-solid fa-pen"></i></button> <a href="#" data-delcat="' + c._id + '" style="color:var(--danger);margin-left:4px" aria-label="Delete ' + esc(c.name) + '">&times;</a></span>').join('') + '</p>'
         ).join('') || '<p class="text-muted">No categories yet.</p>';
       } catch (err) { box.innerHTML = '<p class="text-danger">' + esc(apiErrorMessage(err)) + '</p>'; }
     }
@@ -568,8 +583,14 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         await API.delete(base + d.del);
         toast('Deleted.', 'success');
-        if (base.indexOf('/api/admin') === 0 && me.role === 'ADMIN') adminListings(section);
-        else showSection(me);
+        if (base.indexOf('/api/admin') === 0 && me.role === 'ADMIN') {
+          if (section === 'pending') {
+            adminPending();
+            countPending(me);
+          } else {
+            adminListings(section);
+          }
+        } else showSection(me);
       } catch (err) { toast(apiErrorMessage(err), 'error'); }
       return;
     }
@@ -585,6 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await API.patch('/api/admin/' + MOD_API[d.type] + '/' + id + '/status', { status: status, adminNote: note });
         toast(res.message, 'success');
         refresh();
+        countPending(me);
       } catch (err) { toast(apiErrorMessage(err), 'error'); }
       return;
     }
@@ -615,10 +637,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     if (d.suspendU) {
+      if (d.suspendU === (me.id || me._id) && d.active === 'true') {
+        toast('You cannot suspend your own administrator account.', 'warning');
+        return;
+      }
       try {
-        const rows = await API.get('/api/admin/users');
-        const u = rows.data.find((x) => x._id === d.suspendU);
-        const res = await API.patch('/api/admin/users/' + d.suspendU, { isActive: !(u && u.isActive) });
+        const res = await API.patch('/api/admin/users/' + d.suspendU, { isActive: d.active !== 'true' });
         toast(res.message, 'success');
         adminUsers();
       } catch (err) { toast(apiErrorMessage(err), 'error'); }
@@ -627,8 +651,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (d.role) {
       const role = prompt('New role: USER, BUSINESS_OWNER or ADMIN', 'BUSINESS_OWNER');
       if (!role) return;
+      const normalizedRole = role.toUpperCase();
+      if (!['USER', 'BUSINESS_OWNER', 'ADMIN'].includes(normalizedRole)) {
+        toast('Choose USER, BUSINESS_OWNER or ADMIN.', 'warning');
+        return;
+      }
+      if (d.role === (me.id || me._id) && normalizedRole !== 'ADMIN') {
+        toast('You cannot remove your own administrator role.', 'warning');
+        return;
+      }
       try {
-        const res = await API.patch('/api/admin/users/' + d.role, { role: role.toUpperCase() });
+        const res = await API.patch('/api/admin/users/' + d.role, { role: normalizedRole });
         toast(res.message, 'success');
         adminUsers();
       } catch (err) { toast(apiErrorMessage(err), 'error'); }
@@ -639,6 +672,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!confirm('Delete this category?')) return;
       try { await API.delete('/api/admin/categories/' + d.delcat); toast('Category deleted.', 'success'); adminCategories(); }
       catch (err) { toast(apiErrorMessage(err), 'error'); }
+      return;
+    }
+    if (d.editcat) {
+      e.preventDefault();
+      const name = prompt('New category name:', d.name || '');
+      if (!name || !name.trim()) return;
+      try {
+        const res = await API.patch('/api/admin/categories/' + d.editcat, { name: name.trim() });
+        toast(res.message, 'success');
+        adminCategories();
+      } catch (err) { toast(apiErrorMessage(err), 'error'); }
       return;
     }
     if (d.resolve) {

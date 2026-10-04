@@ -794,7 +794,23 @@ const requestRoute = async (context, user) => {
     if (!current) return fail(404, 'User not found.');
     const patch = {};
     if (body.isActive !== undefined) patch.isActive = Boolean(body.isActive);
-    if (body.role && ['USER', 'BUSINESS_OWNER', 'ADMIN'].includes(body.role)) patch.role = body.role;
+    if (body.role !== undefined) {
+      if (!['USER', 'BUSINESS_OWNER', 'ADMIN'].includes(body.role)) return fail(400, 'Invalid user role.');
+      patch.role = body.role;
+    }
+    if (current.id === user.id && (patch.role && patch.role !== 'ADMIN' || patch.isActive === false)) {
+      return fail(400, 'You cannot remove administrator access from your own account.');
+    }
+    if (current.role === 'ADMIN' && (patch.role && patch.role !== 'ADMIN' || patch.isActive === false)) {
+      const otherAdmins = await findRows(context.env, 'users', {
+        role: 'eq.ADMIN',
+        is_active: 'eq.true',
+        id: `neq.${current.id}`,
+        select: 'id',
+        limit: 1
+      });
+      if (!otherAdmins.rows.length) return fail(409, 'At least one other active administrator must remain.');
+    }
     const updated = await updateRows(context.env, 'users', { id: `eq.${current.id}` }, patch);
     const { passwordHash, ...safe } = updated[0] || current;
     return ok(safe, 200, 'User updated.');

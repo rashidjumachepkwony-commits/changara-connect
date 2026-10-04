@@ -65,8 +65,8 @@ const FIELD_ALIASES = {
   advertisements: { business: 'business_id', startDate: 'start_date', endDate: 'end_date', isDemo: 'is_demo', image: 'image_url', link: 'link_url' },
   categories: {},
   favorites: { user: 'user_id', itemType: 'target_type', itemId: 'target_id' },
-  inquiries: { sender: 'sender_id', itemType: 'entity_type', itemId: 'entity_id' },
-  reports: { reporter: 'reporter_id', itemType: 'entity_type', itemId: 'entity_id' },
+  inquiries: { sender: 'sender_id', business: 'business_id', itemType: 'entity_type', itemId: 'entity_id' },
+  reports: { reporter: 'reporter_id', itemType: 'entity_type', itemId: 'entity_id', description: 'details' },
   payments: { user: 'user_id', transactionId: 'transaction_id', mpesaReceipt: 'mpesa_receipt', paymentType: 'payment_type' },
   contacts: {}
 };
@@ -88,6 +88,7 @@ export const normalizeRow = (table, row) => {
   if (result.targetId !== undefined) result.itemId = result.targetId;
   if (result.entityType !== undefined) result.itemType = result.entityType;
   if (result.entityId !== undefined) result.itemId = result.entityId;
+  if (table === 'reports' && result.details !== undefined) result.description = result.details;
   if (result.id) result._id = result.id;
   const ownerFields = {
     businesses: 'ownerId',
