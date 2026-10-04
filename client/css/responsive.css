@@ -18,7 +18,7 @@
   .chip { padding:5px 9px; font-size:11px; }
   .hero-stats { gap:10px; font-size:11px; }
   .hero-stats b { font-size:14px; }
-  .nav-toggle { font-size:18px; padding:4px 7px; }
+  .nav-toggle { font-size: 24px; padding: 8px 12px; }
   .footer-grid { gap:14px; }
   .f-brand { font-size:14px; }
   .action-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
@@ -104,7 +104,7 @@
 /* ---------- Touch-friendly navigation and filters ---------- */
 @media (max-width: 768px) {
   .nav-links, .header .hbtn { display: none; }
-  .nav-toggle { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
+  .nav-toggle { display: inline-flex; }
 }
 
 @media (max-width: 600px) {
