@@ -139,8 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function listingRow(type, it) {
     const name = it.name || it.title;
-    const view = type === 'business' ? 'business-details.html?id=' + it._id : '#';
-    return '<tr><td><a href="' + view + '">' + esc(name) + '</a></td><td>' + statusDot(it.status) + '</td><td>' + fmtDate(it.createdAt) + '</td><td><span class="actions"><button class="btn btn-sm btn-ghost" data-view="' + it._id + '" data-type="' + type + '">View</button><button class="btn btn-sm btn-danger" data-del="' + it._id + '" data-type="' + type + '">Delete</button></span></td></tr>';
+    const view = viewUrl(type, it._id);
+    const canEdit = ['business', 'product'].includes(type);
+    return '<tr><td><a href="' + view + '">' + esc(name) + '</a></td><td>' + statusDot(it.status) + '</td><td>' + fmtDate(it.createdAt) + '</td><td><span class="actions"><a class="btn btn-sm btn-ghost" href="' + view + '">View</a>' + (canEdit ? '<button class="btn btn-sm btn-outline" data-edit="' + it._id + '" data-type="' + type + '">Edit</button>' : '') + '<button class="btn btn-sm btn-danger" data-del="' + it._id + '" data-type="' + type + '">Delete</button></span></td></tr>';
   }
 /* ===== DASH_USER ===== */
   function stat(label, num, sub) {
@@ -176,11 +177,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function viewUrl(type, id) {
+    const m = { business: 'business-details.html?id=' + id, product: 'marketplace.html?id=' + id, job: 'jobs.html?id=' + id, rental: 'rentals.html?id=' + id, notice: 'notices.html?id=' + id };
+    return m[type] || '#';
+  }
   function ownBlock(title, type, items) {
     if (!items || !items.length) return '';
     const rows = items.map((i) => {
       const note = i.adminNote ? '<br><small class="text-muted">Admin note: ' + esc(i.adminNote) + '</small>' : '';
-      return '<tr><td>' + esc(i.name || i.title) + note + '</td><td>' + statusDot(i.status) + '</td><td>' + (i.views || 0) + '</td><td>' + fmtDate(i.createdAt) + '</td><td><span class="actions"><button class="btn btn-sm btn-danger" data-del="' + i._id + '" data-type="' + type + '">Delete</button></span></td></tr>';
+      const canEdit = ['business', 'product'].includes(type);
+      return '<tr><td>' + esc(i.name || i.title) + note + '</td><td>' + statusDot(i.status) + '</td><td>' + (i.views || 0) + '</td><td>' + fmtDate(i.createdAt) + '</td><td><span class="actions">' +
+        '<a class="btn btn-sm btn-ghost" href="' + viewUrl(type, i._id) + '"><i class="fa-solid fa-eye"></i> View</a>' +
+        (canEdit ? '<button class="btn btn-sm btn-outline" data-edit="' + i._id + '" data-type="' + type + '"><i class="fa-solid fa-pen"></i> Edit</button>' : '') +
+        '<button class="btn btn-sm btn-danger" data-del="' + i._id + '" data-type="' + type + '"><i class="fa-solid fa-trash"></i> Delete</button>' +
+      '</span></td></tr>';
     }).join('');
     return '<h3 class="mt-2">' + esc(title) + ' (' + items.length + ')</h3><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Status</th><th>Views</th><th>Date</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
   }
@@ -306,6 +316,134 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingBtn(button, false);
       }
     });
+  }
+/* ===== DASH_EDIT ===== */
+  async function editBusiness(id) {
+    body.innerHTML = '<div class="sk-line"></div><div class="sk-line" style="height:300px"></div>';
+    try {
+      const res = await API.get('/api/businesses/' + encodeURIComponent(id));
+      const b = res.data;
+      const cats = await getCategories();
+      const catList = cats.business || [];
+      const logoUrl = b.logo || (b.images && b.images[0]) || '';
+      const mediaItems = getListingMedia(b);
+      const mediaHtml = renderMediaGallery(mediaItems, b.name);
+      body.innerHTML =
+        '<form class="form-card" id="editBizForm" enctype="multipart/form-data">' +
+          '<div class="flex-between"><h3>Edit business: ' + esc(b.name) + '</h3>' +
+            '<button type="button" class="btn btn-ghost btn-sm" id="editBizCancel"><i class="fa-solid fa-x"></i> Cancel</button></div>' +
+          '<p class="text-muted">Changes are saved immediately. Admin review may be required after major edits.</p>' +
+          '<div class="form-group"><label class="form-label" for="ebName">Business name *</label><input class="form-input" id="ebName" name="name" required value="' + esc(b.name || '') + '"></div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="ebCat">Category *</label><select class="form-select" id="ebCat" name="category" required>' + catList.map((c) => '<option value="' + esc(c) + '" ' + (c === b.category ? 'selected' : '') + '>' + esc(c) + '</option>').join('') + '</select></div>' +
+            '<div class="form-group"><label class="form-label" for="ebSub">Subcategory</label><input class="form-input" id="ebSub" name="subcategory" value="' + esc(b.subcategory || '') + '"></div>' +
+          '</div>' +
+          '<div class="form-group"><label class="form-label" for="ebDesc">Description *</label><textarea class="form-textarea" id="ebDesc" name="description" required>' + esc(b.description || '') + '</textarea></div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="ebPhone">Phone (Kenyan) *</label><input class="form-input" id="ebPhone" name="phone" required inputmode="tel" placeholder="0712345678" value="' + esc(unmaskPhone(b.phone)) + '"></div>' +
+            '<div class="form-group"><label class="form-label" for="ebWa">WhatsApp</label><input class="form-input" id="ebWa" name="whatsapp" inputmode="tel" placeholder="0712345678" value="' + esc(unmaskPhone(b.whatsapp)) + '"></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="ebLoc">Location *</label><input class="form-input" id="ebLoc" name="location" required value="' + esc(b.location || '') + '"></div>' +
+            '<div class="form-group"><label class="form-label" for="ebVil">Village / area</label><input class="form-input" id="ebVil" name="village" value="' + esc(b.village || '') + '"></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="ebEmail">Email</label><input class="form-input" id="ebEmail" name="email" type="email" value="' + esc(b.email || '') + '"></div>' +
+            '<div class="form-group"><label class="form-label" for="ebHours">Opening hours</label><input class="form-input" id="ebHours" name="openingHours" value="' + esc(b.openingHours || '') + '"></div>' +
+          '</div>' +
+          '<div class="form-group"><label class="form-label" for="ebSvc">Services offered (comma separated)</label><input class="form-input" id="ebSvc" name="services" placeholder="Screen replacement, charging ports" value="' + esc((Array.isArray(b.services) ? b.services.join(', ') : b.services || '').toString()) + '"></div>' +
+          '<div class="form-group"><label class="form-label" for="ebLogo">Change business logo (JPG/PNG/WEBP, max 5MB)</label><label class="file-input">Choose logo<input type="file" id="ebLogo" name="logo" accept="image/jpeg,image/png,image/webp"></label><div id="ebLogoPrev">' + (logoUrl ? '<img src="' + esc(mediaSrc(logoUrl)) + '" alt="Current logo" class="thumb">' : '') + '</div></div>' +
+          '<div class="form-group"><label class="form-label" for="ebMedia">Add more photos, audio or video (up to 6 files)</label><label class="file-input">Choose media<input type="file" id="ebMedia" name="media" accept="image/jpeg,image/png,image/webp,audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,audio/webm,video/mp4,video/webm,video/quicktime" multiple></label><div class="img-preview" id="ebMediaPrev"></div></div>' +
+          mediaHtml +
+          '<p class="form-error" id="ebErr"></p>' +
+          '<button class="btn btn-primary btn-block" type="submit" id="ebSubmit"><i class="fa-solid fa-floppy-disk"></i> Save changes</button>' +
+        '</form>';
+
+      bindImagePreview('ebLogo', 'ebLogoPrev');
+      bindMediaPreview('ebMedia', 'ebMediaPrev');
+      document.getElementById('editBizCancel').addEventListener('click', () => showSection(me));
+      document.getElementById('editBizForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errEl = document.getElementById('ebErr');
+        errEl.classList.remove('show');
+        const btn = document.getElementById('ebSubmit');
+        loadingBtn(btn, true);
+        try {
+          const res = await API.putForm('/api/businesses/' + encodeURIComponent(b._id), new FormData(e.target));
+          toast(res.message || 'Business updated.', 'success');
+          setTimeout(() => showSection(me), 600);
+        } catch (err) { errEl.textContent = apiErrorMessage(err); errEl.classList.add('show'); }
+        finally { loadingBtn(btn, false); }
+      });
+    } catch (err) {
+      body.innerHTML = '<div class="empty-state"><i class="fa-solid fa-wifi"></i><h3>Could not load business</h3><p>' + esc(apiErrorMessage(err)) + '</p></div>';
+    }
+  }
+
+  async function editProduct(id) {
+    body.innerHTML = '<div class="sk-line"></div><div class="sk-line" style="height:300px"></div>';
+    try {
+      const res = await API.get('/api/products/' + encodeURIComponent(id));
+      const p = res.data;
+      const title = p.title || p.name;
+      const cats = await getCategories();
+      const catList = cats.product || [];
+      const mediaItems = getListingMedia(p);
+      const mediaHtml = renderMediaGallery(mediaItems, title);
+      body.innerHTML =
+        '<form class="form-card" id="editProdForm" enctype="multipart/form-data">' +
+          '<div class="flex-between"><h3>Edit item: ' + esc(title) + '</h3>' +
+            '<button type="button" class="btn btn-ghost btn-sm" id="editProdCancel"><i class="fa-solid fa-x"></i> Cancel</button></div>' +
+          '<p class="text-muted">Changes are saved immediately.</p>' +
+          '<div class="form-group"><label class="form-label" for="epTitle">Title *</label><input class="form-input" id="epTitle" name="title" required value="' + esc(title) + '"></div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="epCat">Category *</label><select class="form-select" id="epCat" name="category" required>' + catList.map((c) => '<option value="' + esc(c) + '" ' + (c === p.category ? 'selected' : '') + '>' + esc(c) + '</option>').join('') + '</select></div>' +
+            '<div class="form-group"><label class="form-label" for="epPrice">Price (KSh) *</label><input class="form-input" id="epPrice" name="price" type="number" required min="0" value="' + esc(p.price) + '"></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="epCond">Condition</label><select class="form-select" id="epCond" name="condition"><option value="New"' + (p.condition === 'New' ? ' selected' : '') + '>New</option><option value="Used"' + (p.condition === 'Used' || !p.condition ? ' selected' : '') + '>Used</option></select></div>' +
+            '<div class="form-group"><label class="form-label for="epNeg" class="check-inline"><input type="checkbox" name="negotiable" value="true" ' + (p.negotiable ? 'checked' : '') + '> Negotiable</label></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="epPhone">Phone (Kenyan) *</label><input class="form-input" id="epPhone" name="phone" required inputmode="tel" placeholder="0712345678" value="' + esc(unmaskPhone(p.phone)) + '"></div>' +
+            '<div class="form-group"><label class="form-label" for="epWa">WhatsApp</label><input class="form-input" id="epWa" name="whatsapp" inputmode="tel" placeholder="0712345678" value="' + esc(unmaskPhone(p.whatsapp)) + '"></div>' +
+          '</div>' +
+          '<div class="form-group"><label class="form-label" for="epLoc">Location *</label><input class="form-input" id="epLoc" name="location" required value="' + esc(p.location || '') + '"></div>' +
+          '<div class="form-group"><label class="form-label" for="epDesc">Description</label><textarea class="form-textarea" id="epDesc" name="description">' + esc(p.description || '') + '</textarea></div>' +
+          '<div class="form-group"><label class="form-label" for="epMedia">Add more photos (up to 6 files; 5 MB each)</label><label class="file-input">Choose media<input type="file" id="epMedia" name="media" accept="image/jpeg,image/png,image/webp" multiple></label><div class="img-preview" id="epMediaPrev"></div></div>' +
+          mediaHtml +
+          '<p class="form-error" id="epErr"></p>' +
+          '<button class="btn btn-primary btn-block" type="submit" id="epSubmit"><i class="fa-solid fa-floppy-disk"></i> Save changes</button>' +
+        '</form>';
+
+      bindMediaPreview('epMedia', 'epMediaPrev');
+      document.getElementById('editProdCancel').addEventListener('click', () => showSection(me));
+      document.getElementById('editProdForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errEl = document.getElementById('epErr');
+        errEl.classList.remove('show');
+        const btn = document.getElementById('epSubmit');
+        loadingBtn(btn, true);
+        try {
+          const res = await API.putForm('/api/products/' + encodeURIComponent(p._id), new FormData(e.target));
+          toast(res.message || 'Item updated.', 'success');
+          setTimeout(() => showSection(me), 600);
+        } catch (err) { errEl.textContent = apiErrorMessage(err); errEl.classList.add('show'); }
+        finally { loadingBtn(btn, false); }
+      });
+    } catch (err) {
+      body.innerHTML = '<div class="empty-state"><i class="fa-solid fa-wifi"></i><h3>Could not load item</h3><p>' + esc(apiErrorMessage(err)) + '</p></div>';
+    }
+  }
+
+  function unmaskPhone(v) {
+    if (!v) return '';
+    let d = String(v).replace(/[^\d]/g, '');
+    if (d.length === 12 && d.startsWith('254')) return '0' + d.slice(3);
+    if (d.length === 13 && d.startsWith('+254')) return '0' + d.slice(4);
+    if (d.length === 10 && d.startsWith('0')) return d;
+    if (d.length === 9 && d.startsWith('7')) return '0' + d;
+    return d;
   }
 /* ===== DASH_ADMIN ===== */
   async function adminHome() {
@@ -634,6 +772,13 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         } else showSection(me);
       } catch (err) { toast(apiErrorMessage(err), 'error'); }
+      return;
+    }
+
+    if (d.edit) {
+      e.preventDefault();
+      if (d.type === 'business') editBusiness(d.edit);
+      else if (d.type === 'product') editProduct(d.edit);
       return;
     }
 
