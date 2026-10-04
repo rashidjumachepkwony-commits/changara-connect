@@ -329,7 +329,12 @@ const renderProductCard = (p) => {
       '<p class="lc-price">' + fmtKsh(p.price) + (p.negotiable ? ' <small class="text-muted">Negotiable</small>' : '') + '</p>' +
       '<h3 class="lc-title"><a href="marketplace.html?id=' + p._id + '">' + esc(title) + '</a></h3>' +
       '<p class="lc-sub"><i class="fa-solid fa-tag"></i> ' + esc(p.category) + ' &middot; <i class="fa-solid fa-location-dot"></i> ' + esc(p.location) + '</p>' +
-      '<div class="lc-foot"><span class="lc-meta"><i class="fa-solid fa-rotate"></i> ' + esc(p.condition || '') + '</span><span class="lc-meta"><i class="fa-regular fa-clock"></i> ' + timeAgo(p.createdAt) + '</span></div>' +
+      '<div class="lc-foot">' +
+        (p.phone ? '<a class="lc-btn-call" href="' + buildTelLink(p.phone) + '"><i class="fa-solid fa-phone"></i> CALL ' + esc(formatPhoneForDisplay(p.phone)) + '</a>' : '') +
+        (waLinkFor(p) ? '<a class="lc-btn-wa" href="' + waLinkFor(p) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>' : '') +
+        '<span class="lc-meta"><i class="fa-solid fa-rotate"></i> ' + esc(p.condition || '') + '</span>' +
+        '<span class="lc-meta"><i class="fa-regular fa-clock"></i> ' + timeAgo(p.createdAt) + '</span>' +
+      '</div>' +
     '</div>' +
   '</div>';
 };
