@@ -32,6 +32,7 @@ import {
   toInternational,
   updateRows
 } from '../lib/api.js';
+import { checkSupabaseConnection, restQuery } from '../db/supabase.js';
 
 const VALID_STATUSES = ['PENDING', 'APPROVED', 'REJECTED', 'SUSPENDED'];
 const REPORT_REASONS = ['Spam', 'Scam', 'Wrong information', 'Duplicate', 'Inappropriate content', 'Other'];
@@ -184,7 +185,7 @@ const createResource = async (context, resource, user) => {
       required: ['name', 'category', 'phone', 'description', 'location'],
       titleField: 'name',
       ownerField: 'owner',
-      message: 'Your business has been submitted successfully and is now pending admin approval.',
+      message: 'Your business has been published successfully.',
       payload: () => ({
         name: String(body.name || '').trim(),
         category: String(body.category || '').trim(),
@@ -199,7 +200,7 @@ const createResource = async (context, resource, user) => {
         services: (Array.isArray(body.services) ? body.services : String(body.services || '').split(',')).map((value) => String(value).trim()).filter(Boolean).slice(0, 20),
         logo: (files.logo || [])[0] || null,
         images: files.images || [],
-        status: 'PENDING'
+        status: 'APPROVED'
       })
     },
     products: {
@@ -530,7 +531,15 @@ const requestRoute = async (context, user) => {
   const id = getParamId(context);
   const p = context.params;
 
-  if (handler === 'health') return ok({ status: 'ok', timestamp: new Date().toISOString(), environment: context.env.ENVIRONMENT || 'development', supabaseConfigured: Boolean(context.env.SUPABASE_URL && context.env.SUPABASE_SERVICE_ROLE_KEY) });
+  if (handler === 'health') {
+    const supabase = await checkSupabaseConnection(context.env);
+    return ok({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      environment: context.env.ENVIRONMENT || 'development',
+      ...supabase
+    });
+  }
   if (handler === 'register') {
     const { name, phone, password, role, location, email } = body;
     const normalized = toInternational(phone);

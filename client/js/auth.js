@@ -4,12 +4,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Already logged in? Go straight to the dashboard.
   const params = new URLSearchParams(window.location.search);
-  if (Auth.isLoggedIn()) {
-    window.location.href = params.get('next') || 'dashboard.html';
+  const loginForm = document.getElementById('loginForm');
+  const isAdminLogin = loginForm?.dataset.adminLogin === 'true';
+  const getSafeNextUrl = () => {
+    if (isAdminLogin) return 'dashboard.html?s=admin';
+    const next = params.get('next');
+    if (!next) return 'dashboard.html';
+    try {
+      const target = new URL(next, window.location.href);
+      return target.origin === window.location.origin
+        ? target.pathname + target.search + target.hash
+        : 'dashboard.html';
+    } catch (error) {
+      return 'dashboard.html';
+    }
+  };
+  if (Auth.isLoggedIn() && !isAdminLogin) {
+    window.location.href = getSafeNextUrl();
     return;
   }
 
-  const loginForm = document.getElementById('loginForm');
   if (loginForm) loginForm.addEventListener('submit', handleLogin);
   const regForm = document.getElementById('regForm');
   if (regForm) regForm.addEventListener('submit', handleRegister);
@@ -29,11 +43,16 @@ document.addEventListener('DOMContentLoaded', () => {
     loadingBtn(btn, true);
     try {
       const res = await API.post('/api/auth/login', { phone, password });
+      if (isAdminLogin && res.data.user.role !== 'ADMIN') {
+        errEl.textContent = 'Administrator access is not enabled for this account. Contact the system owner.';
+        errEl.classList.add('show');
+        return;
+      }
       Auth.setToken(res.data.token);
       Auth.setUser(res.data.user);
       toast(res.message || 'Welcome back!', 'success');
       setTimeout(() => {
-        window.location.href = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
+        window.location.href = getSafeNextUrl();
       }, 600);
     } catch (err) {
       errEl.textContent = apiErrorMessage(err);

@@ -72,7 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     } catch (err) {
       count.textContent = 'Could not load';
-      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fa-solid fa-wifi"></i><h3>Could not load services</h3><p>' + esc(apiErrorMessage(err)) + '</p><button class="btn btn-outline" onclick="location.reload()">Retry</button></div>';
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fa-solid fa-wifi"></i><h3>Could not load services</h3><p>' + esc(apiErrorMessage(err)) + '</p><button class="btn btn-outline" type="button" data-retry-services>Retry</button></div>';
+      grid.querySelector('[data-retry-services]').addEventListener('click', load);
     }
   }
 /* ===== SVC_DETAIL ===== */

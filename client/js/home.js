@@ -164,6 +164,7 @@ async function loadSection(elId, url, renderer, emptyMsg) {
       el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nothing here yet</h3><p>' + esc(emptyMsg) + '</p></div>';
     }
   } catch (err) {
-    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-wifi"></i><h3>Could not load</h3><p>' + esc(apiErrorMessage(err)) + '</p><button class="btn btn-outline btn-sm" onclick="location.reload()">Retry</button></div>';
+    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-wifi"></i><h3>Could not load</h3><p>' + esc(apiErrorMessage(err)) + '</p><button class="btn btn-outline btn-sm" type="button" data-retry-section>Retry</button></div>';
+    el.querySelector('[data-retry-section]').addEventListener('click', () => loadSection(elId, url, renderer, emptyMsg));
   }
 }

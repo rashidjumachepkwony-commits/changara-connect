@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator sign in | Changara Connect</title>
+  <meta name="description" content="Secure administrator sign in for Changara Connect.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0e2a47">
+  <link rel="icon" href="/assets/images/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <main class="container mt-3" style="max-width:560px">
+    <a href="index.html" class="brand" style="width:max-content">
+      <i class="fa-solid fa-link brand-icon"></i>
+      <span>Changara Connect<span class="brand-line">Administrator access</span></span>
+    </a>
+    <form class="form-card auth-form mt-3" id="loginForm" data-admin-login="true" novalidate>
+      <p class="badge badge-blue"><i class="fa-solid fa-shield-halved"></i> Restricted access</p>
+      <h1 class="page-title mt-1">Administrator sign in</h1>
+      <p class="page-sub mb-2">Sign in with your existing administrator account. Admin access is assigned by the system owner; signing in here does not grant admin privileges.</p>
+      <div class="form-group">
+        <label class="form-label" for="lId">Email or phone number <span class="req">*</span></label>
+        <input class="form-input" id="lId" name="username" type="text" required autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Admin email or phone">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="lPass">Password <span class="req">*</span></label>
+        <input class="form-input" id="lPass" name="password" type="password" required autocomplete="current-password">
+      </div>
+      <p class="form-error" id="loginErr" role="alert" aria-live="polite"></p>
+      <button class="btn btn-primary btn-block" type="submit" id="loginSubmit">
+        <i class="fa-solid fa-shield-halved"></i> Sign in securely
+      </button>
+      <p class="mt-1" style="text-align:center;font-size:13.5px">
+        <a href="login.html">Return to regular sign in</a>
+      </p>
+    </form>
+    <p class="text-muted mt-2" style="text-align:center;font-size:12px">
+      Never share your password. Changara Connect staff will never ask you to send it by phone or message.
+    </p>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

@@ -1,13 +1,17 @@
 import { handleApiRequest } from './routes/api.js';
 
 const productionFrontendOrigin = 'https://startechafrica.co.ke';
+const currentFrontendOrigin = 'https://changara.startechafrica.co.ke';
 
 const getCorsHeaders = (request, env) => {
   const requestOrigin = request.headers.get('Origin');
   const isLocalDevelopmentOrigin = env.ENVIRONMENT !== 'production' &&
     requestOrigin &&
     /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(requestOrigin);
-  const allowedOrigin = requestOrigin === (env.FRONTEND_URL || productionFrontendOrigin) ||
+  const isProductionFrontendOrigin = requestOrigin === productionFrontendOrigin ||
+    requestOrigin === currentFrontendOrigin;
+  const allowedOrigin = isProductionFrontendOrigin ||
+    requestOrigin === env.FRONTEND_URL ||
     isLocalDevelopmentOrigin
     ? requestOrigin
     : null;

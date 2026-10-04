@@ -47,10 +47,12 @@ for (const name of ['dev', 'deploy', 'validate', 'validate:worker']) {
 }
 
 const productionChecks = [
-  [wranglerToml, 'FRONTEND_URL = "https://startechafrica.co.ke"', 'Wrangler production frontend URL is incorrect.'],
+  [wranglerToml, 'account_id = "0123627158662d9787fbcaed50687469"', 'Wrangler does not reference the expected Cloudflare account.'],
+  [wranglerToml, 'FRONTEND_URL = "https://changara.startechafrica.co.ke"', 'Wrangler production frontend URL is incorrect.'],
   [wranglerToml, 'API_BASE_URL = "https://connect-api.startechafrica.co.ke"', 'Wrangler production API URL is incorrect.'],
+  [wranglerToml, 'SUPABASE_URL = "https://yrtnzjpqnanygqmynfpr.supabase.co"', 'Wrangler production Supabase URL is incorrect.'],
   [apiClient, 'https://connect-api.startechafrica.co.ke', 'Frontend API client does not default to the production Worker URL.'],
-  [homePage, 'https://startechafrica.co.ke/', 'Frontend canonical URL is not the production root domain.']
+  [homePage, 'https://changara.startechafrica.co.ke/', 'Frontend canonical URL is not the production root domain.']
 ];
 for (const [content, expected, message] of productionChecks) {
   if (!content.includes(expected)) errors.push(message);
@@ -61,7 +63,8 @@ if (/connect\.startechafrica\.co\.ke/.test(wranglerToml) ||
   errors.push('Production frontend/API configuration still references connect.startechafrica.co.ke.');
 }
 if (/Access-Control-Allow-Origin['"]?\s*:\s*['"]\*['"]/.test(workerIndex)) errors.push('Worker CORS must not allow every origin.');
-if (!workerIndex.includes('https://startechafrica.co.ke') ||
+if (!workerIndex.includes('https://changara.startechafrica.co.ke') ||
+    !workerIndex.includes('https://startechafrica.co.ke') ||
     !workerIndex.includes('localhost|127\\.0\\.0\\.1') ||
     !workerIndex.includes('Origin is not allowed.')) {
   errors.push('Worker CORS must allow the production frontend and local development only, and reject other origins.');
@@ -78,6 +81,11 @@ if (!workerDb.includes('SUPABASE_SERVICE_ROLE_KEY') || !workerDb.includes('Autho
 }
 if (/SUPABASE_SERVICE_ROLE_KEY\s*=\s*[^#\r\n]+/.test(wranglerToml)) {
   errors.push('Do not put the Supabase service-role key in wrangler.toml.');
+}
+if (!workerDb.includes('export const checkSupabaseConnection') ||
+    !workerDb.includes('supabaseConnectionVerified') ||
+    !workerRoutes.includes('checkSupabaseConnection(context.env)')) {
+  errors.push('Health endpoint must safely report Supabase binding and connection diagnostics.');
 }
 if (!workerLib.includes('bcrypt.hash') || !workerLib.includes('bcrypt.compare') ||
     !workerLib.includes("name: 'HMAC'") || !workerRoutes.includes('signToken(created.id')) {

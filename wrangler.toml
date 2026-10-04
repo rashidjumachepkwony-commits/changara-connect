@@ -1,4 +1,5 @@
 name = "changara-connect-api"
+account_id = "0123627158662d9787fbcaed50687469"
 main = "worker/index.js"
 compatibility_date = "2025-07-18"
 workers_dev = false
@@ -11,12 +12,14 @@ SUPABASE_STORAGE_BUCKET = "uploads"
 
 [env.production]
 name = "changara-connect-api"
+account_id = "0123627158662d9787fbcaed50687469"
 routes = [{ pattern = "connect-api.startechafrica.co.ke", custom_domain = true }]
 
 [env.production.vars]
 ENVIRONMENT = "production"
-FRONTEND_URL = "https://startechafrica.co.ke"
+FRONTEND_URL = "https://changara.startechafrica.co.ke"
 API_BASE_URL = "https://connect-api.startechafrica.co.ke"
+SUPABASE_URL = "https://yrtnzjpqnanygqmynfpr.supabase.co"
 SUPABASE_STORAGE_BUCKET = "uploads"
 
 [triggers]

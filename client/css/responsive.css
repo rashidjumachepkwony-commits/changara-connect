@@ -101,6 +101,28 @@
 /* Horizontal scroll safety for wide tables (admin) */
 .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
+/* ---------- Touch-friendly navigation and filters ---------- */
+@media (max-width: 768px) {
+  .nav-links, .header .hbtn { display: none; }
+  .nav-toggle { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
+}
+
+@media (max-width: 600px) {
+  .filters { align-items: stretch; }
+  .filters .f { flex: 1 1 100%; min-width: 0; }
+  .filters > button { width: 100%; min-height: 44px; }
+  .bottom-nav { padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
+  .bottom-nav a { min-height: 44px; }
+  .bottom-nav .bn-add {
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    margin-top: -18px;
+    border-radius: 50%;
+  }
+}
+
 /* Reduce motion for users who ask for it */
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001s !important; transition-duration: 0.001s !important; }

@@ -1,5 +1,5 @@
 /* CHANGARA CONNECT - Service worker (offline shell, low-data friendly) */
-const CACHE_NAME = 'changara-connect-v1';
+const CACHE_NAME = 'changara-connect-v3';
 const CORE_ASSETS = [
   '/',
   '/index.html',
@@ -12,6 +12,7 @@ const CORE_ASSETS = [
   '/services.html',
   '/notices.html',
   '/login.html',
+  '/admin-login.html',
   '/register.html',
   '/dashboard.html',
   '/profile.html',
@@ -22,7 +23,16 @@ const CORE_ASSETS = [
   '/css/admin.css',
   '/js/api.js',
   '/js/app.js',
+  '/js/auth.js',
+  '/js/businesses.js',
+  '/js/dashboard.js',
+  '/js/details.js',
   '/js/home.js',
+  '/js/jobs.js',
+  '/js/marketplace.js',
+  '/js/notices.js',
+  '/js/rentals.js',
+  '/js/services.js',
   '/manifest.json',
   '/assets/images/placeholder.svg',
   '/assets/images/icon.svg'
@@ -49,17 +59,37 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(fetch(req));
     return;
   }
-  // Cache-first for same-origin pages, CSS, JS and images.
+  // Prefer fresh pages; use the cached shell only when the network is unavailable.
   if (url.origin === self.location.origin) {
-    event.respondWith(
-      caches.match(req, { ignoreSearch: true }).then((hit) => {
-        if (hit) return hit;
-        return fetch(req).then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
-          return res;
-        }).catch(() => caches.match('/index.html'));
-      })
-    );
+    const fetchAndCache = () => fetch(req).then((response) => {
+      if (response.ok) {
+        const updateCache = caches.open(CACHE_NAME).then((cache) => cache.put(req, response.clone()));
+        event.waitUntil(updateCache.catch((error) => console.warn('[service-worker] Cache update failed:', error)));
+      }
+      return response;
+    });
+
+    if (req.mode === 'navigate') {
+      event.respondWith(
+        fetchAndCache().catch(async () => {
+          const cached = await caches.match(req, { ignoreSearch: true });
+          if (cached) return cached;
+          const path = url.pathname.replace(/\/+$/, '');
+          const htmlPath = path && !path.endsWith('.html') ? path + '.html' : path || '/index.html';
+          return await caches.match(htmlPath) || await caches.match('/index.html');
+        })
+      );
+    } else {
+      event.respondWith(
+        caches.match(req, { ignoreSearch: true }).then((cached) => {
+          const update = fetchAndCache().catch(() => cached || new Response('You are offline.', { status: 503 }));
+          if (cached) {
+            event.waitUntil(update.then(() => undefined));
+            return cached;
+          }
+          return update;
+        })
+      );
+    }
   }
 });

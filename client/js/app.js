@@ -1,5 +1,13 @@
 /* CHANGARA CONNECT - Shared UI helpers */
 const esc = (v) => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+let installPromptEvent = null;
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    installPromptEvent = event;
+  });
+}
 
 /* Formatting */
 const fmtKsh = (n) => 'KSh ' + (Number(n || 0)).toLocaleString('en-KE', { maximumFractionDigits: 0 });
@@ -40,17 +48,61 @@ function initModals() {
   document.querySelectorAll('.modal-close').forEach((btn) => btn.addEventListener('click', () => { const m = btn.closest('.modal'); if (m) m.classList.remove('open'); document.body.style.overflow = ''; }));
 }
 /* Drawer */
-const openDrawer = () => { const d = document.getElementById('drawer'); if (d) d.classList.add('open'); };
-const closeDrawer = () => { const d = document.getElementById('drawer'); if (d) d.classList.remove('open'); };
+const openDrawer = () => {
+  const drawer = document.getElementById('drawer');
+  if (!drawer) return;
+  drawer.classList.add('open');
+  drawer.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  const toggle = document.getElementById('navToggle');
+  if (toggle) toggle.setAttribute('aria-expanded', 'true');
+  const dialog = drawer.querySelector('[role="dialog"]');
+  if (dialog) dialog.setAttribute('aria-modal', 'true');
+  const closeButton = drawer.querySelector('.drawer-close');
+  if (closeButton) closeButton.focus();
+};
+const closeDrawer = () => {
+  const drawer = document.getElementById('drawer');
+  if (!drawer) return;
+  const wasOpen = drawer.classList.contains('open');
+  drawer.classList.remove('open');
+  drawer.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  const dialog = drawer.querySelector('[role="dialog"]');
+  if (dialog) dialog.removeAttribute('aria-modal');
+  const toggle = document.getElementById('navToggle');
+  if (toggle) {
+    toggle.setAttribute('aria-expanded', 'false');
+    if (wasOpen) toggle.focus();
+  }
+};
 function initDrawer() {
   const drawer = document.getElementById('drawer');
   if (!drawer) return;
-  drawer.addEventListener('click', (e) => { if (e.target === drawer) closeDrawer(); });
   const toggle = document.getElementById('navToggle');
+  if (toggle) {
+    toggle.setAttribute('aria-controls', 'drawer');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+  drawer.addEventListener('click', (e) => { if (e.target === drawer) closeDrawer(); });
   if (toggle) toggle.addEventListener('click', openDrawer);
   const closeBtn = document.querySelector('.drawer-close');
   if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
   document.querySelectorAll('.drawer-panel a').forEach((a) => a.addEventListener('click', closeDrawer));
+  drawer.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const focusable = drawer.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
 }
 
 /* Auth shell */
@@ -96,7 +148,8 @@ async function getCategories(force) {
 async function fillCategorySelect(selectEl, type, selected) {
   const cats = await getCategories();
   const list = cats[type] || [];
-  selectEl.innerHTML = '<option value="">All ' + type + 's</option>' + list.map((c) => '<option value="' + esc(c) + '" ' + (c === selected ? 'selected' : '') + '>' + esc(c) + '</option>').join('');
+  const labels = { business: 'Businesses', product: 'Products', job: 'Jobs', rental: 'Rentals', notice: 'Notices' };
+  selectEl.innerHTML = '<option value="">All ' + (labels[type] || type + 's') + '</option>' + list.map((c) => '<option value="' + esc(c) + '" ' + (c === selected ? 'selected' : '') + '>' + esc(c) + '</option>').join('');
 }
 
 /* Misc */
@@ -113,6 +166,11 @@ function initShell() {
   initDrawer();
   refreshAuthShell();
   setActiveNav();
+  if ('serviceWorker' in navigator && window.isSecureContext) {
+    navigator.serviceWorker.register('/service-worker.js').catch((error) => {
+      console.error('[app] Service worker registration failed:', error);
+    });
+  }
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModalAll(); closeDrawer(); } });
 }
 
@@ -135,12 +193,27 @@ function bindImagePreview(inputId, previewId) {
   });
 }
 
-/* PWA install helper (documented placeholder - real install is browser-driven) */
+/* PWA install helper */
 function bindInstallButton() {
   const btn = document.getElementById('installApp');
   if (!btn) return;
-  btn.addEventListener('click', () => {
-    toast('On Android Chrome: open the browser menu (⋮) then "Install app" / "Add to Home screen".', 'warning');
+  btn.addEventListener('click', async (event) => {
+    event.preventDefault();
+    if (!installPromptEvent) {
+      toast('Use your browser menu to install Changara Connect or add it to your home screen.', 'warning');
+      return;
+    }
+    const promptEvent = installPromptEvent;
+    installPromptEvent = null;
+    try {
+      await promptEvent.prompt();
+      const choice = await promptEvent.userChoice;
+      if (choice.outcome === 'accepted') toast('Changara Connect was added to your device.', 'success');
+      else toast('Installation was cancelled.', 'warning');
+    } catch (error) {
+      console.error('[app] App installation prompt failed:', error);
+      toast('Could not open the install prompt. Use your browser menu to install the app.', 'error');
+    }
   });
 }
 

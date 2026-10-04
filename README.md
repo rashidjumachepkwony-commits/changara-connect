@@ -53,7 +53,7 @@ MONGODB_URI=mongodb://127.0.0.1:27017/changara-connect
 JWT_SECRET=change-this-to-a-long-random-string
 JWT_EXPIRES_IN=7d
 ADMIN_EMAIL=you@yourdomain.com
-ADMIN_PASSWORD=change-this-strong-password
+ADMIN_PASSWORD=use-a-private-password-at-least-12-characters
 ADMIN_PHONE=254700000000
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
@@ -71,7 +71,7 @@ Notes:
   ```bash
   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
   ```
-- `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_PHONE`: used only to create the first admin when the server starts.
+- `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_PHONE`, `ADMIN_NAME`: required only when manually running a legacy MongoDB seed script to create or promote an admin. Keep real values in an ignored local `.env`; never commit them. The seed scripts reject passwords shorter than 12 characters and no longer provide default credentials.
 - Cloudinary and M-Pesa fields are configuration placeholders for future integration. They are **not** required for version 1.
 
 ### 3. Start MongoDB

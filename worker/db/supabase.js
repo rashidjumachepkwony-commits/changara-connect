@@ -1,17 +1,71 @@
 const getSupabaseConfig = (env = {}) => ({
   url: String(env.SUPABASE_URL || '').replace(/\/+$/, ''),
-  serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY || '',
+  serviceRoleKey: String(env.SUPABASE_SERVICE_ROLE_KEY || '').trim(),
   storageBucket: env.SUPABASE_STORAGE_BUCKET || 'uploads'
 });
+
+const isValidSupabaseUrl = (value) => {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && Boolean(url.hostname);
+  } catch {
+    return false;
+  }
+};
 
 export const ensureSupabaseConfigured = (env = {}) => {
   const config = getSupabaseConfig(env);
   const missing = [];
 
-  if (!config.url) missing.push('SUPABASE_URL');
+  if (!isValidSupabaseUrl(config.url)) missing.push('SUPABASE_URL');
   if (!config.serviceRoleKey) missing.push('SUPABASE_SERVICE_ROLE_KEY');
 
   return { config, isConfigured: missing.length === 0, missing };
+};
+
+export const checkSupabaseConnection = async (env = {}) => {
+  const { isConfigured, missing } = ensureSupabaseConfigured(env);
+  const supabaseUrlConfigured = !missing.includes('SUPABASE_URL');
+  const serviceRoleKeyConfigured = !missing.includes('SUPABASE_SERVICE_ROLE_KEY');
+  const supabaseClientInitialized = isConfigured;
+
+  if (!isConfigured) {
+    return {
+      supabaseConfigured: false,
+      supabaseUrlConfigured,
+      serviceRoleKeyConfigured,
+      supabaseClientInitialized,
+      supabaseConnectionVerified: false,
+      supabaseConnectionStatus: 'configuration_missing'
+    };
+  }
+
+  try {
+    await supabaseRequest(env, '/rest/v1/users?select=id&limit=0');
+    return {
+      supabaseConfigured: true,
+      supabaseUrlConfigured: true,
+      serviceRoleKeyConfigured: true,
+      supabaseClientInitialized: true,
+      supabaseConnectionVerified: true,
+      supabaseConnectionStatus: 'connected'
+    };
+  } catch (error) {
+    const status = error instanceof SupabaseError ? error.status : 0;
+    const connectionStatus = status === 401 || status === 403
+      ? 'credentials_rejected'
+      : status === 404
+        ? 'schema_unavailable'
+        : 'unreachable';
+    return {
+      supabaseConfigured: true,
+      supabaseUrlConfigured: true,
+      serviceRoleKeyConfigured: true,
+      supabaseClientInitialized: true,
+      supabaseConnectionVerified: false,
+      supabaseConnectionStatus: connectionStatus
+    };
+  }
 };
 
 export class SupabaseError extends Error {

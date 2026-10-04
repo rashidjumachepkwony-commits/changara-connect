@@ -30,7 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     { k: 'ads', label: 'Advertisements', icon: 'fa-rectangle-ad' },
     { k: 'categories', label: 'Categories', icon: 'fa-tags' },
     { k: 'reports', label: 'Reports', icon: 'fa-flag' },
-    { k: 'inquiries', label: 'My Inquiries', icon: 'fa-inbox' },
+    { k: 'payments', label: 'Payments', icon: 'fa-money-bill-wave' },
+    { k: 'inquiries', label: 'Inquiries', icon: 'fa-inbox' },
     { k: 'profile', label: 'My Profile', icon: 'fa-user-gear' }
   ];
 
@@ -70,8 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
       b.addEventListener('click', () => {
         section = b.getAttribute('data-tab');
         nav.querySelectorAll('[data-tab]').forEach((x) => x.classList.toggle('active', x === b));
-        showSection(me);
-      })
+          const nextUrl = new URL(window.location.href);
+          nextUrl.searchParams.set('s', section);
+          window.history.replaceState({}, '', nextUrl);
+          showSection(me);
+        })
     );
   }
 
@@ -84,6 +88,36 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btn && !btn.querySelector('.nav-badge')) btn.insertAdjacentHTML('beforeend', '<span class="nav-badge">' + res.data.total + '</span>');
       }
     } catch (e) { /* ignore */ }
+  }
+
+  function showSection(me) {
+    const sections = me.role === 'ADMIN'
+      ? {
+          admin: () => adminHome(),
+          pending: () => adminPending(),
+          businesses: () => adminListings('businesses'),
+          products: () => adminListings('products'),
+          jobs: () => adminListings('jobs'),
+          rentals: () => adminListings('rentals'),
+          notices: () => adminListings('notices'),
+          users: () => adminUsers(),
+          ads: () => adminAds(),
+          categories: () => adminCategories(),
+          reports: () => adminReports(),
+          payments: () => adminPayments(),
+          inquiries: () => userInquiries(me),
+          profile: () => dashboardProfile(me)
+        }
+      : {
+          overview: () => userOverview(me),
+          listings: () => userListings(),
+          saved: () => userSaved(),
+          inquiries: () => userInquiries(me),
+          profile: () => dashboardProfile(me)
+        };
+
+    const render = sections[section];
+    if (render) render();
   }
 
   function statusDot(s) {
@@ -172,21 +206,93 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function userInquiries() {
+  async function userInquiries(me) {
     body.innerHTML = '<div class="sk-line"></div><div class="sk-line" style="height:200px"></div>';
     try {
-      const res = await API.get('/api/user/inquiries');
+      const [res, businesses] = await Promise.all([
+        API.get('/api/user/inquiries'),
+        me.role === 'ADMIN' ? API.get('/api/admin/businesses') : Promise.resolve({ data: [] })
+      ]);
+      const businessNames = new Map((businesses.data || []).map((business) => [business._id, business.name]));
       const items = res.data || [];
       if (!items.length) {
         body.innerHTML = '<div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>No inquiries yet</h3><p>Messages customers send about your businesses will appear here.</p></div>';
         return;
       }
       body.innerHTML = '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Business</th><th>From</th><th>Message</th></tr></thead><tbody>' +
-        items.map((q) => '<tr><td>' + fmtDate(q.createdAt) + '</td><td>' + esc(q.business && q.business.name) + '</td><td>' + esc(q.name) + '<br><a href="' + buildTelLink(q.phone) + '">' + esc(q.phone) + '</a></td><td>' + esc(q.message) + '</td></tr>').join('') +
+        items.map((q) => {
+          const businessId = q.businessId || q.business_id || (q.business && (q.business._id || q.business.id));
+          const businessName = q.business && q.business.name || businessNames.get(businessId) || 'Business';
+          return '<tr><td>' + fmtDate(q.createdAt) + '</td><td>' + esc(businessName) + '</td><td>' + esc(q.name) + '<br><a href="' + buildTelLink(q.phone) + '">' + esc(q.phone) + '</a></td><td>' + esc(q.message) + '</td></tr>';
+        }).join('') +
         '</tbody></table></div>';
     } catch (err) {
       body.innerHTML = '<p class="text-danger">' + esc(apiErrorMessage(err)) + '</p>';
     }
+  }
+
+  function dashboardProfile(me) {
+    body.innerHTML =
+      '<form class="form-card" id="dashboardProfileForm">' +
+        '<h3>Account details</h3>' +
+        '<div class="form-group"><label class="form-label" for="dashProfileName">Full name</label><input class="form-input" id="dashProfileName" name="name" required value="' + esc(me.name || '') + '"></div>' +
+        '<div class="form-group"><label class="form-label" for="dashProfilePhone">Phone</label><input class="form-input" id="dashProfilePhone" value="' + esc(me.phone || '') + '" disabled></div>' +
+        '<div class="form-group"><label class="form-label" for="dashProfileEmail">Email</label><input class="form-input" id="dashProfileEmail" name="email" type="email" value="' + esc(me.email || '') + '"></div>' +
+        '<div class="form-group"><label class="form-label" for="dashProfileLocation">Location</label><input class="form-input" id="dashProfileLocation" name="location" value="' + esc(me.location || '') + '"></div>' +
+        '<p class="form-error" id="dashProfileError" role="alert"></p>' +
+        '<button class="btn btn-primary" type="submit" id="dashProfileSave">Save profile</button>' +
+      '</form>' +
+      '<form class="form-card mt-2" id="dashboardPasswordForm">' +
+        '<h3>Change password</h3>' +
+        '<div class="form-group"><label class="form-label" for="dashCurrentPassword">Current password</label><input class="form-input" id="dashCurrentPassword" name="currentPassword" type="password" autocomplete="current-password" required></div>' +
+        '<div class="form-group"><label class="form-label" for="dashNewPassword">New password</label><input class="form-input" id="dashNewPassword" name="newPassword" type="password" autocomplete="new-password" minlength="6" required></div>' +
+        '<p class="form-error" id="dashPasswordError" role="alert"></p>' +
+        '<button class="btn btn-outline" type="submit" id="dashPasswordSave">Update password</button>' +
+      '</form>';
+
+    document.getElementById('dashboardProfileForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const error = document.getElementById('dashProfileError');
+      const button = document.getElementById('dashProfileSave');
+      error.classList.remove('show');
+      loadingBtn(button, true);
+      try {
+        const values = Object.fromEntries(new FormData(form).entries());
+        const result = await API.put('/api/user/profile', values);
+        Object.assign(me, result.data);
+        Auth.setUser(result.data);
+        document.getElementById('sideName').textContent = result.data.name;
+        document.getElementById('dashSub').textContent = 'Welcome, ' + result.data.name + '.';
+        refreshAuthShell();
+        toast(result.message || 'Profile updated.', 'success');
+      } catch (err) {
+        error.textContent = apiErrorMessage(err);
+        error.classList.add('show');
+      } finally {
+        loadingBtn(button, false);
+      }
+    });
+
+    document.getElementById('dashboardPasswordForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const error = document.getElementById('dashPasswordError');
+      const button = document.getElementById('dashPasswordSave');
+      error.classList.remove('show');
+      loadingBtn(button, true);
+      try {
+        const values = Object.fromEntries(new FormData(form).entries());
+        const result = await API.put('/api/user/profile', values);
+        toast(result.message || 'Password updated.', 'success');
+        form.reset();
+      } catch (err) {
+        error.textContent = apiErrorMessage(err);
+        error.classList.add('show');
+      } finally {
+        loadingBtn(button, false);
+      }
+    });
   }
 /* ===== DASH_ADMIN ===== */
   async function adminHome() {
@@ -312,16 +418,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 /* ===== DASH_REST ===== */
   async function adminUsers() {
-    body.innerHTML = '<div class="filters"><div class="f"><input id="uSearch" type="search" placeholder="Search users by name or phone..."></div></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Phone</th><th>Role</th><th></th></tr></thead><tbody id="uRows"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>';
+    body.innerHTML = '<div class="filters"><div class="f"><input id="uSearch" type="search" placeholder="Search users by name, phone or email..."></div></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Contact</th><th>Role</th><th>Account</th><th>Actions</th></tr></thead><tbody id="uRows"><tr><td colspan="5">Loading...</td></tr></tbody></table></div>';
     document.getElementById('uSearch').addEventListener('input', debounce(loadUsers, 400));
     async function loadUsers() {
       const q = document.getElementById('uSearch').value.trim();
       const rows = document.getElementById('uRows');
       try {
         const res = await API.get('/api/admin/users' + (q ? '?q=' + encodeURIComponent(q) : ''));
-        if (!res.data.length) { rows.innerHTML = '<tr><td colspan="4">No users found.</td></tr>'; return; }
-        rows.innerHTML = res.data.map((u) => '<tr><td>' + esc(u.name) + '<br><small class="text-muted">' + fmtDate(u.createdAt) + '</small></td><td>' + esc(u.phone) + '</td><td>' + esc(u.role) + (u.isActive ? '' : ' <span class="badge badge-red">Suspended</span>') + '</td><td><span class="actions"><button class="btn btn-sm btn-ghost" data-suspend-u="' + u._id + '">' + (u.isActive ? 'Suspend' : 'Activate') + '</button><button class="btn btn-sm btn-outline" data-role="' + u._id + '">Role</button></span></td></tr>').join('');
-      } catch (err) { rows.innerHTML = '<tr><td colspan="4">' + esc(apiErrorMessage(err)) + '</td></tr>'; }
+        if (!res.data.length) { rows.innerHTML = '<tr><td colspan="5">No users found.</td></tr>'; return; }
+        rows.innerHTML = res.data.map((u) => '<tr><td>' + esc(u.name) + '<br><small class="text-muted">' + fmtDate(u.createdAt) + '</small></td><td>' + esc(u.email || '-') + '<br><a href="' + buildTelLink(u.phone) + '">' + esc(u.phone) + '</a></td><td>' + esc(u.role) + '</td><td>' + (u.isActive ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-red">Suspended</span>') + '</td><td><span class="actions"><button class="btn btn-sm btn-ghost" data-suspend-u="' + u._id + '" data-active="' + u.isActive + '">' + (u.isActive ? 'Suspend' : 'Activate') + '</button><button class="btn btn-sm btn-outline" data-role="' + u._id + '">Change role</button></span></td></tr>').join('');
+      } catch (err) { rows.innerHTML = '<tr><td colspan="5">' + esc(apiErrorMessage(err)) + '</td></tr>'; }
     }
     loadUsers();
   }
@@ -421,6 +527,23 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) { rows.innerHTML = '<tr><td colspan="4">' + esc(apiErrorMessage(err)) + '</td></tr>'; }
     }
     fillReports();
+  }
+
+  async function adminPayments() {
+    body.innerHTML = '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Reference</th><th>Type</th><th>Amount</th><th>Status</th><th>User</th></tr></thead><tbody id="paymentRows"><tr><td colspan="6">Loading...</td></tr></tbody></table></div>';
+    try {
+      const res = await API.get('/api/admin/payments');
+      const rows = document.getElementById('paymentRows');
+      if (!res.data.length) {
+        rows.innerHTML = '<tr><td colspan="6">No payment records yet.</td></tr>';
+        return;
+      }
+      rows.innerHTML = res.data.map((payment) =>
+        '<tr><td>' + fmtDate(payment.createdAt) + '</td><td>' + esc(payment.transactionId || payment.mpesaReceipt || '-') + '</td><td>' + esc(payment.paymentType || '-') + '</td><td>KSh ' + esc(String(payment.amount || 0)) + '</td><td>' + statusDot(payment.status || 'UNKNOWN') + '</td><td>' + esc(payment.phone || payment.userId || '-') + '</td></tr>'
+      ).join('');
+    } catch (err) {
+      document.getElementById('paymentRows').innerHTML = '<tr><td colspan="6">' + esc(apiErrorMessage(err)) + '</td></tr>';
+    }
   }
 /* ===== DASH_ACT ===== */
   async function wireActions(e, me) {
