@@ -417,6 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rows.innerHTML = items.map((i) => {
           const title = esc(i.name || i.title);
           return '<tr><td>' + title + '<br><small class="text-muted">' + esc(i.category || i.propertyType || '') + '</small></td><td>' + statusDot(i.status) + '</td><td><span class="actions">' +
+            '<button class="btn btn-sm btn-outline" data-media="' + i._id + '">Manage media</button>' +
             '<button class="btn btn-sm btn-green" data-approve="' + i._id + '" data-type="' + t + '">Approve</button>' +
             '<button class="btn btn-sm btn-ghost" data-reject="' + i._id + '" data-type="' + t + '">Reject</button>' +
             '<button class="btn btn-sm btn-orange" data-suspend="' + i._id + '" data-type="' + t + '">Suspend</button>' +
@@ -425,11 +426,50 @@ document.addEventListener('DOMContentLoaded', () => {
             '<button class="btn btn-sm btn-danger" data-del="' + i._id + '" data-type="' + t + '">Delete</button>' +
           '</span></td></tr>';
         }).join('');
+        rows.querySelectorAll('[data-media]').forEach((button) => {
+          button.addEventListener('click', () => {
+            const item = items.find((entry) => entry._id === button.getAttribute('data-media'));
+            if (item) adminMediaForm(t, item);
+          });
+        });
       } catch (err) {
         rows.innerHTML = '<tr><td colspan="3">' + esc(apiErrorMessage(err)) + '</td></tr>';
       }
     }
     fillMod(type);
+  }
+
+  function adminMediaForm(type, item) {
+    const title = item.name || item.title || MOD_LABEL[type];
+    body.innerHTML =
+      '<form class="form-card" id="listingMediaForm" enctype="multipart/form-data">' +
+        '<h3>Manage media: ' + esc(title) + '</h3>' +
+        '<p class="text-muted">Existing uploads are kept. New uploads are added to this listing.</p>' +
+        renderMediaGallery(getListingMedia(item), title) +
+        '<div class="form-group"><label class="form-label" for="listingMedia">Add photos, audio or video (up to 6 files)</label><label class="file-input">Choose media<input type="file" id="listingMedia" name="media" accept="image/jpeg,image/png,image/webp,audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,audio/webm,video/mp4,video/webm,video/quicktime" multiple></label><div class="img-preview" id="listingMediaPreview"></div></div>' +
+        '<p class="form-error" id="listingMediaError"></p>' +
+        '<button class="btn btn-primary" type="submit">Save media</button> <button class="btn btn-ghost" type="button" id="listingMediaCancel">Cancel</button>' +
+      '</form>';
+    bindMediaPreview('listingMedia', 'listingMediaPreview');
+    document.getElementById('listingMediaCancel').addEventListener('click', () => adminListings(type));
+    document.getElementById('listingMediaForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const error = document.getElementById('listingMediaError');
+      error.classList.remove('show');
+      if (!document.getElementById('listingMedia').files.length) {
+        error.textContent = 'Choose at least one media file to upload.';
+        error.classList.add('show');
+        return;
+      }
+      try {
+        await API.putForm('/api/' + MOD_API[type] + '/' + encodeURIComponent(item._id), new FormData(event.currentTarget));
+        toast('Listing media updated.', 'success');
+        adminListings(type);
+      } catch (err) {
+        error.textContent = apiErrorMessage(err);
+        error.classList.add('show');
+      }
+    });
   }
 /* ===== DASH_REST ===== */
   async function adminUsers() {
@@ -473,12 +513,14 @@ document.addEventListener('DOMContentLoaded', () => {
         '<div class="form-group"><label class="form-label">Link (optional)</label><input class="form-input" name="link" value="' + esc(ad.link || '') + '"></div></div>' +
         '<div class="form-row"><div class="form-group"><label class="form-label">Start date</label><input class="form-input" type="date" name="startDate"></div>' +
         '<div class="form-group"><label class="form-label">End date</label><input class="form-input" type="date" name="endDate"></div></div>' +
-        '<div class="form-group"><label class="form-label">Image</label><label class="file-input">Choose image<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label></div>' +
+        '<div class="form-group"><label class="form-label" for="adMedia">Photos, audio or video (up to 6 files)</label><label class="file-input">Choose media<input type="file" id="adMedia" name="media" accept="image/jpeg,image/png,image/webp,audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,audio/webm,video/mp4,video/webm,video/quicktime" multiple></label><div class="img-preview" id="adMediaPreview"></div></div>' +
+        renderMediaGallery(getListingMedia(ad), ad.title || 'Advertisement') +
         '<div class="form-group"><label class="check-inline"><input type="checkbox" name="active" value="true" ' + (ad.active ? 'checked' : '') + '> Active</label></div>' +
         '<p class="form-error" id="adErr"></p>' +
         '<button class="btn btn-primary" type="submit">' + (ad._id ? 'Save changes' : 'Create advertisement') + '</button> ' +
         '<button class="btn btn-ghost" type="button" id="adCancel">Cancel</button>' +
       '</form>';
+    bindMediaPreview('adMedia', 'adMediaPreview');
     document.getElementById('adCancel').addEventListener('click', () => adminAds());
     document.getElementById('adForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -487,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const fd = new FormData(e.target);
         let res;
-        if (ad._id) { res = await API.putForm('/api/admin/ads/' + ad._id, fd); }
+        if (ad._id) { res = await API.patchForm('/api/admin/ads/' + ad._id, fd); }
         else { res = await API.postForm('/api/admin/ads', fd); }
         toast(res.message, 'success');
         adminAds();

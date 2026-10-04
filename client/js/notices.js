@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     openModal('postNotModal');
   });
-  bindImagePreview('ntImg', 'ntImgPrev');
+  bindMediaPreview('ntMedia', 'ntMediaPrev');
   document.getElementById('notForm').addEventListener('submit', submitNotice);
 
   async function load() {
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await API.get('/api/notices/' + encodeURIComponent(nid));
       const n = res.data;
       box.innerHTML =
-        (n.image ? '<img src="' + esc(mediaSrc(n.image)) + '" alt="' + esc(n.title) + '" loading="lazy" style="width:100%;height:220px;object-fit:cover;border-radius:10px;margin-bottom:12px">' : '') +
+        renderMediaGallery(getListingMedia(n), n.title) +
         '<h3>' + esc(n.title) + '</h3>' +
         '<p class="mt-1"><span class="badge badge-blue">' + esc(n.category) + '</span></p>' +
         (n.location ? '<p class="lc-sub mt-1"><i class="fa-solid fa-location-dot"></i> ' + esc(n.location) + '</p>' : '') +

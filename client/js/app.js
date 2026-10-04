@@ -21,6 +21,32 @@ const buildTelLink = (number) => { const intl = toIntl(number); return intl ? 't
 
 /* Image fallback (low data: tiny local SVG) */
 const mediaSrc = (src) => { if (src && src.startsWith('/uploads')) return src; if (src && (src.startsWith('http://') || src.startsWith('https://'))) return src; return '/assets/images/placeholder.svg'; };
+const getListingMedia = (item = {}) => {
+  const inferKind = (url) => {
+    const cleanUrl = String(url || '').split('?')[0].toLowerCase();
+    if (/\.(mp3|m4a|aac|wav|ogg|opus)$/.test(cleanUrl)) return 'audio';
+    if (/\.(mp4|webm|mov|m4v)$/.test(cleanUrl)) return 'video';
+    return 'image';
+  };
+  const assets = [
+    ...(Array.isArray(item.media) ? item.media : []),
+    ...(Array.isArray(item.images) ? item.images : []),
+    ...(item.image ? [item.image] : [])
+  ].map((asset) => typeof asset === 'string'
+    ? { url: asset, kind: inferKind(asset) }
+    : asset && typeof asset === 'object' ? asset : null)
+    .filter((asset) => asset && ['image', 'audio', 'video'].includes(asset.kind) && typeof asset.url === 'string');
+  return assets.filter((asset, index) => assets.findIndex((candidate) => candidate.url === asset.url) === index);
+};
+const renderMediaGallery = (assets, title) => {
+  const content = (assets || []).map((asset) => {
+    const src = esc(mediaSrc(asset.url));
+    if (asset.kind === 'audio') return '<div class="media-item"><audio controls preload="metadata" aria-label="' + esc(title) + ' audio"><source src="' + src + '" type="' + esc(asset.mimeType || '') + '"></audio></div>';
+    if (asset.kind === 'video') return '<div class="media-item"><video controls playsinline preload="metadata" aria-label="' + esc(title) + ' video"><source src="' + src + '" type="' + esc(asset.mimeType || '') + '"></video></div>';
+    return '<a class="media-item" href="' + src + '" target="_blank" rel="noopener"><img src="' + src + '" alt="' + esc(title) + '" loading="lazy"></a>';
+  }).join('');
+  return content ? '<div class="media-gallery">' + content + '</div>' : '';
+};
 
 /* Toasts */
 function toast(message, type = 'success') {
@@ -193,6 +219,43 @@ function bindImagePreview(inputId, previewId) {
   });
 }
 
+function bindMediaPreview(inputId, previewId) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+  if (!input || !preview) return;
+  const clearPreview = () => {
+    preview.querySelectorAll('[data-preview-url]').forEach((element) => URL.revokeObjectURL(element.dataset.previewUrl));
+    preview.replaceChildren();
+  };
+  input.addEventListener('change', () => {
+    clearPreview();
+    Array.from(input.files || []).forEach((file) => {
+      const url = URL.createObjectURL(file);
+      const kind = file.type.startsWith('audio/') ? 'audio' : file.type.startsWith('video/') ? 'video' : 'image';
+      const item = document.createElement('div');
+      item.className = 'media-preview-item';
+      let element;
+      if (kind === 'audio') {
+        element = document.createElement('audio');
+        element.controls = true;
+      } else if (kind === 'video') {
+        element = document.createElement('video');
+        element.controls = true;
+        element.playsInline = true;
+      } else {
+        element = document.createElement('img');
+        element.className = 'thumb';
+        element.alt = 'Upload preview';
+      }
+      element.src = url;
+      element.dataset.previewUrl = url;
+      item.appendChild(element);
+      preview.appendChild(item);
+    });
+  });
+  if (input.form) input.form.addEventListener('reset', clearPreview);
+}
+
 /* PWA install helper */
 function bindInstallButton() {
   const btn = document.getElementById('installApp');
@@ -248,9 +311,9 @@ const renderBusinessCard = (b) =>
   '</div>';
 
 const renderProductCard = (p) => {
-  const img = p.images && p.images.length ? p.images[0] : null;
+  const img = getListingMedia(p).find((asset) => asset.kind === 'image');
   return '<div class="card listing-card">' +
-    mediaBox('marketplace.html?id=' + p._id, img, p.title, p.featured ? '<span class="lc-tier">&#11088; FEATURED</span>' : '') +
+    mediaBox('marketplace.html?id=' + p._id, img && img.url, p.title, p.featured ? '<span class="lc-tier">&#11088; FEATURED</span>' : '') +
     '<div class="lc-body">' +
       '<p class="lc-price">' + fmtKsh(p.price) + (p.negotiable ? ' <small class="text-muted">Negotiable</small>' : '') + '</p>' +
       '<h3 class="lc-title"><a href="marketplace.html?id=' + p._id + '">' + esc(p.title) + '</a></h3>' +
@@ -275,15 +338,16 @@ const renderJobCard = (j) =>
       '<h3 class="lc-title"><a href="jobs.html?id=' + j._id + '">' + esc(j.title) + '</a></h3>' +
       '<p class="lc-sub"><i class="fa-solid fa-building"></i> ' + esc(j.employer) + ' &middot; <i class="fa-solid fa-location-dot"></i> ' + esc(j.location) + '</p>' +
       '<p class="lc-desc">' + esc(j.description) + '</p>' +
+      renderMediaGallery(getListingMedia(j), j.title) +
       '<div class="lc-foot"><span class="badge badge-blue">' + esc(j.category) + '</span><span class="lc-meta"><i class="fa-regular fa-clock"></i> ' + timeAgo(j.createdAt) + '</span></div>' +
     '</div>' +
   '</div>';
 
 const renderRentalCard = (r) => {
-  const img = r.images && r.images.length ? r.images[0] : null;
+  const img = getListingMedia(r).find((asset) => asset.kind === 'image');
   const avail = '<span class="lc-tier" style="background:' + (r.available ? '#0f6d3a;color:#fff">Available' : '#8a5d05;color:#fff">Taken') + '</span>';
   return '<div class="card listing-card">' +
-    mediaBox('rentals.html?id=' + r._id, img, r.title, avail) +
+    mediaBox('rentals.html?id=' + r._id, img && img.url, r.title, avail) +
     '<div class="lc-body">' +
       '<p class="lc-price">' + fmtKsh(r.price) + ' <small class="text-muted">/month</small></p>' +
       '<h3 class="lc-title"><a href="rentals.html?id=' + r._id + '">' + esc(r.title) + '</a></h3>' +
@@ -295,6 +359,7 @@ const renderRentalCard = (r) => {
 const renderNoticeCard = (n) =>
   '<div class="card listing-card">' +
     '<div class="lc-body">' +
+      renderMediaGallery(getListingMedia(n), n.title) +
       '<h3 class="lc-title"><a href="notices.html?id=' + n._id + '">' + esc(n.title) + '</a></h3>' +
       '<p class="lc-sub"><i class="fa-solid fa-bullhorn"></i> ' + esc(n.category) + (n.location ? ' &middot; <i class="fa-solid fa-location-dot"></i> ' + esc(n.location) : '') + '</p>' +
       '<p class="lc-desc">' + esc(n.description) + '</p>' +

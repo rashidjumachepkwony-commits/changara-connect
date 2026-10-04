@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     openModal('postRentModal');
   });
-  bindImagePreview('rtImgs', 'rtImgsPrev');
+  bindMediaPreview('rtMedia', 'rtMediaPrev');
   document.getElementById('rentForm').addEventListener('submit', submitRental);
 
   async function load() {
@@ -78,12 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
     errEl.classList.remove('show');
     const btn = document.getElementById('rentSubmit');
     const form = document.getElementById('rentForm');
-    const imgs = document.getElementById('rtImgs');
-    if (imgs.files.length > 6) {
-      errEl.textContent = 'You can upload a maximum of 6 photos.';
-      errEl.classList.add('show');
-      return;
-    }
     loadingBtn(btn, true);
     try {
       const res = await API.postForm('/api/rentals', new FormData(form));
@@ -104,10 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await API.get('/api/rentals/' + encodeURIComponent(rid));
       const r = res.data;
-      const imgs = (r.images || []).map((src) => '<img src="' + esc(mediaSrc(src)) + '" alt="' + esc(r.title) + '" loading="lazy" style="width:100%;height:220px;object-fit:cover;border-radius:10px">').join('');
+      const gallery = renderMediaGallery(getListingMedia(r), r.title);
       const wb = buildWhatsAppLink(r.whatsapp || r.phone, 'Hello, I saw your rental "' + r.title + '" on Changara Connect and I am interested.');
       box.innerHTML =
-        (imgs ? '<div class="grid grid-2" style="gap:8px;margin-bottom:12px">' + imgs + '</div>' : '') +
+        gallery +
         '<p class="lc-price">' + fmtKsh(r.price) + ' <small class="text-muted">/month</small></p>' +
         '<h3>' + esc(r.title) + '</h3>' +
         '<p class="lc-sub"><i class="fa-solid fa-house"></i> ' + esc(r.propertyType) + (r.rooms > 0 ? ' &middot; ' + r.rooms + ' room(s)' : '') + '</p>' +

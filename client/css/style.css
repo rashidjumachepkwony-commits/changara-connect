@@ -134,6 +134,14 @@ input,select,textarea{font-family:inherit;font-size:15px;color:var(--text)}
 .file-input input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 .img-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .img-preview .thumb{width:64px;height:64px;border-radius:8px;object-fit:cover;border:1px solid var(--border)}
+.media-preview-item{max-width:100%}
+.media-preview-item audio{width:min(260px,100%)}
+.media-preview-item video{width:min(260px,100%);max-height:180px;border-radius:8px}
+.media-gallery{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.media-gallery .media-item{display:block;max-width:100%}
+.media-gallery img{display:block;width:140px;height:105px;object-fit:cover;border-radius:8px;border:1px solid var(--border)}
+.media-gallery audio{display:block;width:min(320px,100%)}
+.media-gallery video{display:block;width:min(360px,100%);max-height:240px;border-radius:8px;background:#111}
 
 /* -------- Hero -------- */
 .hero{background:linear-gradient(160deg,#0e2a47 0%,#123a63 40%,#1668e3 100%);color:#fff;padding:34px 16px 30px;position:relative;overflow:hidden}

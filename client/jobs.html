@@ -106,7 +106,7 @@
       <div class="modal-head"><h3 id="postJobTitle">Post a job</h3><button class="modal-close" aria-label="Close">&times;</button></div>
       <div class="modal-body">
         <p class="notice-strip"><i class="fa-solid fa-circle-info"></i> Jobs are reviewed by an admin before they appear publicly.</p>
-        <form id="jobForm" class="mt-2">
+        <form id="jobForm" class="mt-2" enctype="multipart/form-data">
           <div class="form-group"><label class="form-label" for="jbTitle">Job title <span class="req">*</span></label><input class="form-input" id="jbTitle" name="title" required maxlength="120" placeholder="e.g. Need 2 people for maize harvesting"></div>
           <div class="form-row">
             <div class="form-group"><label class="form-label" for="jbEmp">Employer <span class="req">*</span></label><input class="form-input" id="jbEmp" name="employer" required maxlength="120"></div>
@@ -126,6 +126,7 @@
             <div class="form-group"><label class="form-label" for="jbClose">Closing date</label><input class="form-input" id="jbClose" name="closingDate" type="date"></div>
           </div>
           <div class="form-group"><label class="form-label" for="jbHow">How to apply</label><textarea class="form-textarea" id="jbHow" name="applicationInstructions" maxlength="1000" placeholder="e.g. Call the number above or visit our shop"></textarea></div>
+          <div class="form-group"><label class="form-label" for="jbMedia">Photos, audio or video (up to 6 files; 5 MB images, 20 MB audio, 50 MB video)</label><label class="file-input">Choose media<input type="file" id="jbMedia" name="media" accept="image/jpeg,image/png,image/webp,audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,audio/webm,video/mp4,video/webm,video/quicktime" multiple></label><div class="img-preview" id="jbMediaPrev"></div></div>
           <p class="form-error" id="jobErr"></p>
           <button class="btn btn-primary btn-block" type="submit" id="jobSubmit"><i class="fa-solid fa-paper-plane"></i> Submit for review</button>
         </form>

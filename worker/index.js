@@ -2,6 +2,7 @@ import { handleApiRequest } from './routes/api.js';
 
 const productionFrontendOrigin = 'https://startechafrica.co.ke';
 const currentFrontendOrigin = 'https://changara.startechafrica.co.ke';
+const pagesProjectOriginPattern = /^https:\/\/(?:[a-z0-9-]+\.)?changara-connect\.pages\.dev$/;
 
 const getCorsHeaders = (request, env) => {
   const requestOrigin = request.headers.get('Origin');
@@ -10,7 +11,9 @@ const getCorsHeaders = (request, env) => {
     /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(requestOrigin);
   const isProductionFrontendOrigin = requestOrigin === productionFrontendOrigin ||
     requestOrigin === currentFrontendOrigin;
+  const isPagesProjectOrigin = requestOrigin && pagesProjectOriginPattern.test(requestOrigin);
   const allowedOrigin = isProductionFrontendOrigin ||
+    isPagesProjectOrigin ||
     requestOrigin === env.FRONTEND_URL ||
     isLocalDevelopmentOrigin
     ? requestOrigin

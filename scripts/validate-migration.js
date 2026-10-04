@@ -15,6 +15,7 @@ const requiredFiles = [
   'worker/lib/api.js',
   'worker/db/supabase.js',
   'supabase/migrations/001_initial_schema.sql',
+  'supabase/migrations/002_public_listing_media.sql',
   'scripts/migrate-mongodb-to-supabase.js',
   'WORKER_ROUTES.md'
 ];
@@ -39,6 +40,7 @@ const workerRoutes = read('worker/routes/api.js');
 const workerLib = read('worker/lib/api.js');
 const workerDb = read('worker/db/supabase.js');
 const schema = read('supabase/migrations/001_initial_schema.sql');
+const mediaMigration = read('supabase/migrations/002_public_listing_media.sql');
 const routeDoc = read('WORKER_ROUTES.md');
 const server = read('server/server.js');
 
@@ -65,9 +67,10 @@ if (/connect\.startechafrica\.co\.ke/.test(wranglerToml) ||
 if (/Access-Control-Allow-Origin['"]?\s*:\s*['"]\*['"]/.test(workerIndex)) errors.push('Worker CORS must not allow every origin.');
 if (!workerIndex.includes('https://changara.startechafrica.co.ke') ||
     !workerIndex.includes('https://startechafrica.co.ke') ||
+    !workerIndex.includes('changara-connect\\.pages\\.dev') ||
     !workerIndex.includes('localhost|127\\.0\\.0\\.1') ||
     !workerIndex.includes('Origin is not allowed.')) {
-  errors.push('Worker CORS must allow the production frontend and local development only, and reject other origins.');
+  errors.push('Worker CORS must allow the branded frontend, its Pages project hostnames, and local development, and reject unrelated origins.');
 }
 
 for (const variable of ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'JWT_SECRET', 'FRONTEND_URL', 'API_BASE_URL']) {
@@ -164,6 +167,41 @@ for (const table of ['jobs', 'notices']) {
 }
 if (!workerRoutes.includes('uploadObject') && !workerLib.includes('uploadObject')) {
   errors.push('Worker has no Supabase Storage upload implementation.');
+}
+for (const table of ['businesses', 'products', 'jobs', 'rentals', 'notices', 'advertisements']) {
+  if (!new RegExp(`alter table if exists public\\.${table}[\\s\\S]*?add column if not exists media jsonb`, 'i').test(mediaMigration)) {
+    errors.push(`Media migration is missing the ${table}.media column.`);
+  }
+}
+if (!mediaMigration.includes("'uploads'") ||
+    !mediaMigration.includes('set public = excluded.public') ||
+    !mediaMigration.includes('allowed_mime_types')) {
+  errors.push('Media migration must provision the public uploads bucket with a media MIME allowlist.');
+}
+if (!workerLib.includes("audio/mpeg") || !workerLib.includes("video/quicktime") ||
+    !workerLib.includes('Maximum size is ${maximumSize} MB')) {
+  errors.push('Worker upload validation must allowlisted images, audio and video with type-specific size limits.');
+}
+if (!workerRoutes.includes('uploadedMedia(files)') ||
+    !workerRoutes.includes('payload.media = [...(Array.isArray(current.media)')) {
+  errors.push('Worker create/update routes must persist uploaded media for listings.');
+}
+for (const frontendFile of [
+  'client/businesses.html',
+  'client/marketplace.html',
+  'client/jobs.html',
+  'client/rentals.html',
+  'client/notices.html'
+]) {
+  if (!read(frontendFile).includes('name="media"')) errors.push(`${frontendFile} is missing its media upload control.`);
+}
+if (!read('client/js/dashboard.js').includes('Manage media') ||
+    !read('client/js/dashboard.js').includes('id="adMedia"')) {
+  errors.push('Admin listing and advertisement screens must support media uploads.');
+}
+if (!apiClient.includes("patchForm: (url, formData) => apiRequest('PATCH'") ||
+    !read('client/js/dashboard.js').includes("API.patchForm('/api/admin/ads/'")) {
+  errors.push('Multipart advertisement updates must use the Worker PATCH route.');
 }
 
 if (errors.length) {

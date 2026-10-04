@@ -285,19 +285,31 @@ export const parseRequestBody = async (request, env, uploadPrefix = 'listings') 
     const files = {};
     let fileCount = 0;
     const maximumFiles = uploadPrefix.includes('business') ? 7 : 6;
+    const mediaEndpoint = /^(?:(?:create|update)-(?:business|product|job|rental|notice)|admin-(?:create|update)-ad)$/.test(uploadPrefix);
     for (const [key, value] of form.entries()) {
       if (value instanceof File) {
         if (!value.size) continue;
+        if (key === 'media' && !mediaEndpoint) {
+          throw new SupabaseError('Media uploads are not supported by this endpoint.', 400);
+        }
         fileCount += 1;
-        if (fileCount > maximumFiles) throw new SupabaseError(`You can upload a maximum of ${maximumFiles} images.`, 400);
-        if (value.size > 5 * 1024 * 1024) throw new SupabaseError('Image is too large. Maximum size is 5 MB.', 400);
-        if (!['image/jpeg', 'image/png', 'image/webp'].includes(value.type)) {
-          throw new SupabaseError('Only JPG, JPEG, PNG or WEBP images are allowed.', 400);
+        if (fileCount > maximumFiles) throw new SupabaseError(`You can upload a maximum of ${maximumFiles} files.`, 400);
+        const mediaType = getMediaType(value.type);
+        const maximumSize = mediaType === 'video' ? 50 : mediaType === 'audio' ? 20 : 5;
+        if (!mediaType) throw new SupabaseError('Use JPG, PNG, WEBP, MP3, WAV, M4A, OGG, MP4, WEBM or MOV files only.', 400);
+        if (value.size > maximumSize * 1024 * 1024) {
+          throw new SupabaseError(`${mediaType[0].toUpperCase()}${mediaType.slice(1)} file is too large. Maximum size is ${maximumSize} MB.`, 400);
+        }
+        if (key !== 'media' && mediaType !== 'image') {
+          throw new SupabaseError('This upload field accepts images only.', 400);
         }
         if (!files[key]) files[key] = [];
-        if (files[key].length >= 6) throw new SupabaseError('You can upload a maximum of 6 images.', 400);
+        const fieldMaximum = key === 'media' ? 6 : key === 'logo' || key === 'image' || key === 'profileImage' ? 1 : 6;
+        if (files[key].length >= fieldMaximum) throw new SupabaseError(`You can upload a maximum of ${fieldMaximum} file${fieldMaximum === 1 ? '' : 's'} in this field.`, 400);
         const upload = await uploadObject(env, value, uploadPrefix);
-        files[key].push(upload.url);
+        files[key].push(key === 'media'
+          ? { url: upload.url, kind: mediaType, mimeType: value.type }
+          : upload.url);
       } else {
         if (data[key] !== undefined) {
           data[key] = Array.isArray(data[key]) ? [...data[key], value] : [data[key], value];
@@ -315,6 +327,13 @@ export const parseRequestBody = async (request, env, uploadPrefix = 'listings') 
   } catch {
     throw new SupabaseError('Invalid JSON request body.', 400);
   }
+};
+
+const getMediaType = (mimeType) => {
+  if (['image/jpeg', 'image/png', 'image/webp'].includes(mimeType)) return 'image';
+  if (['audio/mpeg', 'audio/mp4', 'audio/aac', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/webm'].includes(mimeType)) return 'audio';
+  if (['video/mp4', 'video/webm', 'video/quicktime'].includes(mimeType)) return 'video';
+  return null;
 };
 
 export const hashPassword = async (password) => bcrypt.hash(String(password), 10);

@@ -1,5 +1,5 @@
 /* CHANGARA CONNECT - Service worker (offline shell, low-data friendly) */
-const CACHE_NAME = 'changara-connect-v3';
+const CACHE_NAME = 'changara-connect-v4';
 const CORE_ASSETS = [
   '/',
   '/index.html',

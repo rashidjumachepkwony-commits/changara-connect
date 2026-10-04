@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     openModal('sellModal');
   });
 
-  bindImagePreview('sImgs', 'sImgsPrev');
+  bindMediaPreview('sMedia', 'sMediaPrev');
   document.getElementById('sellForm').addEventListener('submit', submitProduct);
 
   async function load() {
@@ -92,9 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
     errEl.classList.remove('show');
     const btn = document.getElementById('sellSubmit');
     const form = document.getElementById('sellForm');
-    const imgs = document.getElementById('sImgs');
-    if (imgs.files.length > 6) {
-      errEl.textContent = 'You can upload a maximum of 6 photos.';
+    const media = document.getElementById('sMedia');
+    if (media.files.length > 6) {
+      errEl.textContent = 'You can upload a maximum of 6 media files.';
       errEl.classList.add('show');
       return;
     }
@@ -125,10 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderDetail(p) {
     const box = document.getElementById('prodDetail');
-    const imgs = (p.images || []).map((src) => '<img src="' + esc(mediaSrc(src)) + '" alt="' + esc(p.title) + '" loading="lazy" style="width:100%;height:220px;object-fit:cover;border-radius:10px">').join('');
+    const gallery = renderMediaGallery(getListingMedia(p), p.title);
     const wb = buildWhatsAppLink(p.whatsapp || p.phone, 'Hello, I saw your item "' + p.title + '" on Changara Connect and I am interested.');
     box.innerHTML =
-      (imgs ? '<div class="grid grid-2" style="gap:8px;margin-bottom:12px">' + imgs + '</div>' : '') +
+      gallery +
       '<p class="lc-price">' + fmtKsh(p.price) + (p.negotiable ? ' <small class="text-muted">Negotiable</small>' : '') + '</p>' +
       '<h3>' + esc(p.title) + '</h3>' +
       '<p class="lc-sub"><i class="fa-solid fa-tag"></i> ' + esc(p.category) + ' &middot; <i class="fa-solid fa-location-dot"></i> ' + esc(p.location) + '</p>' +

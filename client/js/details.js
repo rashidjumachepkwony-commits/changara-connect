@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('crumbName').textContent = b.name;
     const wb = buildWhatsAppLink(b.whatsapp || b.phone);
     const tel = buildTelLink(b.phone);
-    const gallery = (b.images || []).map((src) => '<a href="' + esc(mediaSrc(src)) + '" target="_blank" rel="noopener"><img src="' + esc(mediaSrc(src)) + '" alt="' + esc(b.name) + ' photo" loading="lazy" style="width:84px;height:84px;object-fit:cover;border-radius:10px"></a>').join('');
+    const gallery = renderMediaGallery(getListingMedia(b), b.name);
     const services = (b.services || []).map((s) => '<span class="pill">' + esc(s) + '</span>').join(' ');
     const products = (b.products || []).map(renderProductCard).join('');
 
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '<hr class="divider">' +
         '<div class="flex" style="gap:14px"><button class="lc-btn-call" id="contactBtn"><i class="fa-solid fa-paper-plane"></i> Send message</button><button class="lc-btn-call" id="reportBtn" style="color:var(--danger)"><i class="fa-solid fa-flag"></i> REPORT LISTING</button></div>' +
       '</div></div>' +
-      (gallery ? '<div class="card mt-2"><div class="card-body"><h2 class="mb-1">Photos</h2><div style="display:flex;gap:8px;flex-wrap:wrap">' + gallery + '</div></div></div>' : '') +
+      (gallery ? '<div class="card mt-2"><div class="card-body"><h2 class="mb-1">Photos, audio &amp; video</h2>' + gallery + '</div></div>' : '') +
       (products ? '<div class="section-title"><h2>Products from this seller</h2></div><div class="grid grid-auto">' + products + '</div>' : '');
 /* ===== DETAIL_ACTIONS ===== */
     body.querySelectorAll('[data-click]').forEach((a) =>

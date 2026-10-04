@@ -4,11 +4,11 @@
 
 A local marketplace and services platform for Changara and the surrounding areas of Teso North, Busia County, Kenya.
 
-## Cloudflare migration status
+## Cloudflare production architecture
 
-The intended production topology is Cloudflare Pages at `https://startechafrica.co.ke/`, a Cloudflare Worker API at `https://connect-api.startechafrica.co.ke/`, and Supabase PostgreSQL/Storage. `client/` remains the static frontend.
+The production frontend is Cloudflare Pages at `https://changara.startechafrica.co.ke/`; the API is the `changara-connect-api` Worker at `https://connect-api.startechafrica.co.ke/`, backed by Supabase PostgreSQL and Storage. `client/` is the static frontend.
 
-The migration is **not production-ready yet**: the Worker currently contains a health endpoint and explicit unimplemented responses, not replacements for the Express API route handlers. The Supabase schema and migration utility are preparatory and do not yet migrate all existing data or implement the application’s authentication, moderation, listing, search, and upload behavior. Keep the existing application available until those features are implemented and verified. `npm run validate` deliberately fails while these route handlers are missing. See [DEPLOYMENT.md](./DEPLOYMENT.md) for the exact Cloudflare setup and remaining blockers.
+To enable public listing media uploads, apply [`supabase/migrations/002_public_listing_media.sql`](./supabase/migrations/002_public_listing_media.sql) in the Supabase SQL Editor before deploying the corresponding Worker and Pages changes. It adds media metadata columns and provisions the public `uploads` bucket. Listing and advertisement media is publicly viewable; user profile pictures remain image-only.
 
 The Express/MongoDB server and its dependencies are retained for legacy local use and historical data migration. They are not used by the Cloudflare Worker.
 
@@ -168,13 +168,13 @@ No React, Angular, Vue, or other large frontend framework is used. The goal is a
 
 | Layer | Target |
 |---|---|
-| Frontend | Cloudflare Pages at `https://startechafrica.co.ke/` |
+| Frontend | Cloudflare Pages at `https://changara.startechafrica.co.ke/` |
 | API | Cloudflare Worker at `https://connect-api.startechafrica.co.ke/` |
 | Database | Supabase PostgreSQL |
 | File storage | Supabase Storage |
 | DNS | Cloudflare DNS |
 
-The target backend routes and data migration are not yet complete. See [DEPLOYMENT.md](./DEPLOYMENT.md) before attempting deployment.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment instructions.
 
 ---
 

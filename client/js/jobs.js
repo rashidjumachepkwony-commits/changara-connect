@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     openModal('postJobModal');
   });
+  bindMediaPreview('jbMedia', 'jbMediaPrev');
   document.getElementById('jobForm').addEventListener('submit', submitJob);
 
   async function load() {
@@ -85,10 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
     errEl.classList.remove('show');
     const btn = document.getElementById('jobSubmit');
     const fd = new FormData(document.getElementById('jobForm'));
-    const payload = Object.fromEntries(fd.entries());
     loadingBtn(btn, true);
     try {
-      const res = await API.post('/api/jobs', payload);
+      const res = await API.postForm('/api/jobs', fd);
       toast(res.message || 'Job submitted.', 'success');
       document.getElementById('jobForm').reset();
       closeModal('postJobModal');
@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '<p class="lc-sub"><i class="fa-solid fa-building"></i> ' + esc(j.employer) + ' &middot; <i class="fa-solid fa-location-dot"></i> ' + esc(j.location) + '</p>' +
         '<p class="mt-1"><span class="badge badge-blue">' + esc(j.category) + '</span> <span class="lc-meta">Posted ' + fmtDate(j.createdAt) + '</span></p>' +
         '<p class="mt-1">' + esc(j.description).replace(/\n/g, '<br>') + '</p>' +
+        renderMediaGallery(getListingMedia(j), j.title) +
         (j.applicationInstructions ? '<p class="mt-1"><b>How to apply:</b> ' + esc(j.applicationInstructions) + '</p>' : '') +
         (j.closingDate ? '<p class="lc-meta"><i class="fa-regular fa-calendar"></i> Closing: ' + fmtDate(j.closingDate) + '</p>' : '') +
         '<div class="grid grid-2 mt-2">' +

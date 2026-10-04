@@ -86,7 +86,8 @@ const API = {
   delete: (url) => apiRequest('DELETE', url),
   // multipart helpers (used by the post/update forms)
   postForm: (url, formData) => apiRequest('POST', url, formData, { form: true }),
-  putForm: (url, formData) => apiRequest('PUT', url, formData, { form: true })
+  putForm: (url, formData) => apiRequest('PUT', url, formData, { form: true }),
+  patchForm: (url, formData) => apiRequest('PATCH', url, formData, { form: true })
 };
 
 /** Friendly network failure message. */

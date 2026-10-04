@@ -177,6 +177,12 @@ const findById = async (env, table, id, filters = {}) => findByIdOrSlug(env, tab
 
 const readBody = async (request, env, prefix) => parseRequestBody(request, env, prefix);
 
+const uploadedMedia = (files = {}) => files.media || [];
+const uploadedImageUrls = (files = {}) => [
+  ...(files.images || []),
+  ...uploadedMedia(files).filter((item) => item.kind === 'image').map((item) => item.url)
+];
+
 const createResource = async (context, resource, user) => {
   const { data: body, files } = context.body;
   const table = dbTable(resource);
@@ -199,7 +205,7 @@ const createResource = async (context, resource, user) => {
         openingHours: String(body.openingHours || '').trim(),
         services: (Array.isArray(body.services) ? body.services : String(body.services || '').split(',')).map((value) => String(value).trim()).filter(Boolean).slice(0, 20),
         logo: (files.logo || [])[0] || null,
-        images: files.images || [],
+        images: uploadedImageUrls(files),
         status: 'APPROVED'
       })
     },
@@ -219,7 +225,7 @@ const createResource = async (context, resource, user) => {
         location: String(body.location || '').trim(),
         phone: toInternational(body.phone),
         whatsapp: body.whatsapp ? toInternational(body.whatsapp) : toInternational(body.phone),
-        images: files.images || [],
+        images: uploadedImageUrls(files),
         status: 'PENDING'
       })
     },
@@ -255,7 +261,7 @@ const createResource = async (context, resource, user) => {
         location: String(body.location || '').trim(),
         description: String(body.description || '').trim(),
         rooms: Math.max(Number(body.rooms) || 0, 0),
-        images: files.images || [],
+        images: uploadedImageUrls(files),
         phone: toInternational(body.phone),
         whatsapp: body.whatsapp ? toInternational(body.whatsapp) : toInternational(body.phone),
         available: body.available === 'false' ? false : body.available !== false,
@@ -273,7 +279,7 @@ const createResource = async (context, resource, user) => {
         description: String(body.description || '').trim(),
         location: String(body.location || '').trim(),
         contact: String(body.contact || '').trim(),
-        image: (files.image || [])[0] || null,
+        image: (files.image || [])[0] || uploadedImageUrls(files)[0] || null,
         expiryDate: body.expiryDate && !Number.isNaN(Date.parse(body.expiryDate)) ? new Date(body.expiryDate).toISOString() : null,
         status: 'PENDING'
       })
@@ -289,6 +295,7 @@ const createResource = async (context, resource, user) => {
   if (resource === 'notices' && !DEFAULT_CATEGORIES.notice.includes(body.category)) return fail(400, 'Please choose a valid category.');
 
   const payload = spec.payload();
+  if (uploadedMedia(files).length) payload.media = uploadedMedia(files);
   if (resource === 'businesses' && (!payload.phone || String(body.phone).replace(/\D/g, '').length < 9)) return fail(400, 'Invalid phone number.');
   if (resource === 'products' && (!Number.isFinite(payload.price) || payload.price < 0)) return fail(400, 'Please enter a valid price in KSh.');
   if (resource === 'rentals' && (!Number.isFinite(payload.price) || payload.price < 0)) return fail(400, 'Please enter a valid monthly price in KSh.');
@@ -338,13 +345,17 @@ const updateResource = async (context, resource, user) => {
   for (const field of ['expiryDate', 'closingDate']) {
     if (payload[field]) payload[field] = new Date(payload[field]).toISOString();
   }
+  const newMedia = uploadedMedia(files);
+  const newImages = uploadedImageUrls(files);
+  if (newMedia.length) payload.media = [...(Array.isArray(current.media) ? current.media : []), ...newMedia];
   if (resource === 'businesses') {
     if (files.logo?.[0]) payload.logo = files.logo[0];
-    if (files.images?.length) payload.images = files.images;
+    if (newImages.length) payload.images = [...(Array.isArray(current.images) ? current.images : []), ...newImages];
   } else if (resource === 'notices') {
     if (files.image?.[0]) payload.image = files.image[0];
-  } else if (files.images?.length) {
-    payload.images = files.images;
+    else if (newImages.length) payload.image = newImages[0];
+  } else if (['products', 'rentals'].includes(resource) && newImages.length) {
+    payload.images = [...(Array.isArray(current.images) ? current.images : []), ...newImages];
   }
   if (user.role !== 'ADMIN' && current.status === 'REJECTED') payload.status = 'PENDING';
   const updated = await updateRows(context.env, spec.table, paramFilter(getParamId(context)), payload);
@@ -855,8 +866,10 @@ const requestRoute = async (context, user) => {
   if (handler === 'adminAds') return ok((await findRows(context.env, 'advertisements', { order: 'created_at.desc', limit: 500 })).rows);
   if (handler === 'adminCreateAd') {
     if (!body.title || !String(body.title).trim()) return fail(400, 'Ad title is required.');
-    const image = context.body.files.image?.[0] || null;
-    return ok(await createRow(context.env, 'advertisements', {
+    const files = context.body.files;
+    const media = uploadedMedia(files);
+    const image = files.image?.[0] || media.find((item) => item.kind === 'image')?.url || null;
+    const payload = {
       title: String(body.title).trim(),
       description: String(body.description || '').trim(),
       link: String(body.link || '').trim(),
@@ -866,7 +879,9 @@ const requestRoute = async (context, user) => {
       startDate: body.startDate || null,
       endDate: body.endDate || null,
       active: body.active === 'true' || body.active === true
-    }), 201, 'Advertisement created.');
+    };
+    if (media.length) payload.media = media;
+    return ok(await createRow(context.env, 'advertisements', payload), 201, 'Advertisement created.');
   }
   if (handler === 'adminUpdateAd') {
     const ad = await findById(context.env, 'advertisements', id);
@@ -874,7 +889,11 @@ const requestRoute = async (context, user) => {
     const patch = {};
     for (const field of ['title', 'description', 'link', 'placement', 'startDate', 'endDate']) if (body[field] !== undefined) patch[field] = body[field];
     if (body.active !== undefined) patch.active = body.active === true || body.active === 'true';
-    if (context.body.files.image?.[0]) patch.image = context.body.files.image[0];
+    const files = context.body.files;
+    const media = uploadedMedia(files);
+    if (files.image?.[0]) patch.image = files.image[0];
+    else if (media.some((item) => item.kind === 'image')) patch.image = media.find((item) => item.kind === 'image').url;
+    if (media.length) patch.media = [...(Array.isArray(ad.media) ? ad.media : []), ...media];
     const rows = await updateRows(context.env, 'advertisements', { id: `eq.${ad.id}` }, patch);
     return ok(rows[0], 200, 'Advertisement updated.');
   }

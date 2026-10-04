@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   bindImagePreview('bLogo', 'bLogoPrev');
-  bindImagePreview('bImgs', 'bImgsPrev');
+  bindMediaPreview('bMedia', 'bMediaPrev');
   document.getElementById('bizForm').addEventListener('submit', submitBusiness);
 
   async function load() {
@@ -110,14 +110,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fd = new FormData(form);
     const logoInput = document.getElementById('bLogo');
-    const imgsInput = document.getElementById('bImgs');
+    const mediaInput = document.getElementById('bMedia');
     if (logoInput.files.length > 1) {
       errEl.textContent = 'Please choose only one logo image.';
       errEl.classList.add('show');
       return;
     }
-    if (imgsInput.files.length > 6) {
-      errEl.textContent = 'You can upload a maximum of 6 photos.';
+    if (mediaInput.files.length > 6) {
+      errEl.textContent = 'You can upload a maximum of 6 media files.';
       errEl.classList.add('show');
       return;
     }

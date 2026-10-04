@@ -146,7 +146,8 @@ async function loadAds() {
       sec.style.display = '';
       row.innerHTML = res.data.map((a) => {
         const inner = '<div class="ad-tag">Sponsored</div><div class="ad-title">' + esc(a.title) + '</div>' + (a.description ? '<div class="ad-desc">' + esc(a.description) + '</div>' : '');
-        return a.link ? '<a class="ad-banner" href="' + esc(a.link) + '" target="_blank" rel="noopener">' + inner + '</a>' : '<div class="ad-banner">' + inner + '</div>';
+        const banner = a.link ? '<a class="ad-banner" href="' + esc(a.link) + '" target="_blank" rel="noopener">' + inner + '</a>' : '<div class="ad-banner">' + inner + '</div>';
+        return '<div class="ad-item">' + banner + renderMediaGallery(getListingMedia(a), a.title) + '</div>';
       }).join('');
     }
   } catch (e) { /* ads optional */ }
