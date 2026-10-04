@@ -27,6 +27,15 @@ const formatPhoneForDisplay = (number) => {
   if (d.length === 9) return d.slice(0, 4) + ' ' + d.slice(4);
   return d;
 };
+const unmaskPhone = (v) => {
+  if (!v) return '';
+  let d = String(v).replace(/[^\d]/g, '');
+  if (d.length === 12 && d.startsWith('254')) return '0' + d.slice(3);
+  if (d.length === 13 && d.startsWith('+254')) return '0' + d.slice(4);
+  if (d.length === 10 && d.startsWith('0')) return d;
+  if (d.length === 9 && d.startsWith('7')) return '0' + d;
+  return d;
+};
 
 /* Image fallback (low data: tiny local SVG) */
 const mediaSrc = (src) => { if (src && src.startsWith('/uploads')) return src; if (src && (src.startsWith('http://') || src.startsWith('https://'))) return src; return '/assets/images/placeholder.svg'; };

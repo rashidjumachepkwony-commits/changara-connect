@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function render(b) {
+    const user = Auth.getUser();
+    const isOwner = user && b && (b.ownerId === user._id || b.ownerId === user.id || (b.owner && (b.owner._id === user._id || b.owner.id === user.id)));
     document.getElementById('crumbName').textContent = b.name;
     const wb = buildWhatsAppLink(b.whatsapp || b.phone);
     const tel = buildTelLink(b.phone);
@@ -48,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
           '<a class="btn btn-outline btn-block" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(b.name + ' ' + b.location + ' Kenya') + '" target="_blank" rel="noopener"><i class="fa-solid fa-location-arrow"></i> GET DIRECTIONS</a>' +
           '<button class="btn btn-ghost btn-block" id="saveBtn"><i class="fa-solid fa-bookmark"></i> SAVE BUSINESS</button>' +
         '</div>' +
+        (isOwner ? '<div class="mt-2"><button class="btn btn-outline btn-block" id="editBizBtn"><i class="fa-solid fa-pen"></i> Edit this business</button></div>' : '') +
       '</div></div>' +
       '<div class="card mt-2"><div class="card-body">' +
         '<h2 class="mb-1">Contact &amp; Hours</h2>' +
@@ -115,6 +118,69 @@ document.addEventListener('DOMContentLoaded', () => {
         errEl.textContent = apiErrorMessage(err);
         errEl.classList.add('show');
       } finally { loadingBtn(btn, false); }
+    });
+
+    const editBtn = document.getElementById('editBizBtn');
+    if (editBtn) {
+      editBtn.addEventListener('click', () => openBizEdit(b));
+    }
+  }
+
+  async function openBizEdit(b) {
+    const res = await API.get('/api/categories');
+    const cats = res.data;
+    const catList = cats.business || [];
+    const logoUrl = b.logo || (b.images && b.images[0]) || '';
+    const gallery = renderMediaGallery(getListingMedia(b), b.name);
+
+    body.innerHTML =
+      '<div class="card mt-2"><div class="card-body">' +
+        '<div class="flex-between"><h3>Edit business: ' + esc(b.name) + '</h3>' +
+          '<a href="business-details.html?id=' + b._id + '" class="btn btn-ghost btn-sm"><i class="fa-solid fa-x"></i> Cancel</a></div>' +
+        '<p class="text-muted">Update your business details below. Changes are saved immediately.</p>' +
+        '<form class="form-card" id="bizEditForm" enctype="multipart/form-data" style="box-shadow:none;padding:0">' +
+          '<div class="form-group"><label class="form-label" for="ebName">Business name *</label><input class="form-input" id="ebName" name="name" required value="' + esc(b.name || '') + '"></div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="ebCat">Category *</label><select class="form-select" id="ebCat" name="category" required>' + catList.map((c) => '<option value="' + esc(c) + '" ' + (c === b.category ? 'selected' : '') + '>' + esc(c) + '</option>').join('') + '</select></div>' +
+            '<div class="form-group"><label class="form-label" for="ebSub">Subcategory</label><input class="form-input" id="ebSub" name="subcategory" value="' + esc(b.subcategory || '') + '"></div>' +
+          '</div>' +
+          '<div class="form-group"><label class="form-label" for="ebDesc">Description *</label><textarea class="form-textarea" id="ebDesc" name="description" required maxlength="2000">' + esc(b.description || '') + '</textarea></div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="ebPhone">Phone (Kenyan) *</label><input class="form-input" id="ebPhone" name="phone" required inputmode="tel" placeholder="0712345678" value="' + esc(unmaskPhone(b.phone)) + '"></div>' +
+            '<div class="form-group"><label class="form-label" for="ebWa">WhatsApp</label><input class="form-input" id="ebWa" name="whatsapp" inputmode="tel" placeholder="0712345678" value="' + esc(unmaskPhone(b.whatsapp)) + '"></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="ebLoc">Location *</label><input class="form-input" id="ebLoc" name="location" required value="' + esc(b.location || '') + '"></div>' +
+            '<div class="form-group"><label class="form-label" for="ebVil">Village / area</label><input class="form-input" id="ebVil" name="village" value="' + esc(b.village || '') + '"></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label class="form-label" for="ebEmail">Email</label><input class="form-input" id="ebEmail" name="email" type="email" value="' + esc(b.email || '') + '"></div>' +
+            '<div class="form-group"><label class="form-label" for="ebHours">Opening hours</label><input class="form-input" id="ebHours" name="openingHours" value="' + esc(b.openingHours || '') + '"></div>' +
+          '</div>' +
+          '<div class="form-group"><label class="form-label" for="ebSvc">Services offered (comma separated)</label><input class="form-input" id="ebSvc" name="services" placeholder="e.g. Screen replacement, charging ports" value="' + esc((Array.isArray(b.services) ? b.services.join(', ') : b.services || '').toString()) + '"></div>' +
+          '<div class="form-group"><label class="form-label">Current logo</label>' + (logoUrl ? '<img src="' + esc(mediaSrc(logoUrl)) + '" alt="Current logo" style="width:76px;height:76px;border-radius:12px;border:1px solid var(--border);object-fit:cover">' : '<span class="text-muted">No logo uploaded</span>') + '</div>' +
+          '<div class="form-group"><label class="form-label" for="ebLogo">Change logo (JPG/PNG/WEBP, max 5MB)</label><label class="file-input">Choose new logo<input type="file" id="ebLogo" name="logo" accept="image/jpeg,image/png,image/webp"></label><div id="ebLogoPrev"></div></div>' +
+          '<div class="form-group"><label class="form-label" for="ebMedia">Add more photos/audio/video (up to 6 files)</label><label class="file-input">Choose media<input type="file" id="ebMedia" name="media" accept="image/jpeg,image/png,image/webp,audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,audio/webm,video/mp4,video/webm,video/quicktime" multiple></label><div class="img-preview" id="ebMediaPrev"></div></div>' +
+          (gallery ? '<div class="form-group"><label class="form-label">Existing media</label>' + gallery + '</div>' : '') +
+          '<p class="form-error" id="ebErr"></p>' +
+          '<button class="btn btn-primary btn-block" type="submit" id="ebSubmit"><i class="fa-solid fa-floppy-disk"></i> Save changes</button>' +
+        '</form>' +
+      '</div></div>';
+
+    bindImagePreview('ebLogo', 'ebLogoPrev');
+    bindMediaPreview('ebMedia', 'ebMediaPrev');
+    document.getElementById('bizEditForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errEl = document.getElementById('ebErr');
+      errEl.classList.remove('show');
+      const btn = document.getElementById('ebSubmit');
+      loadingBtn(btn, true);
+      try {
+        const res = await API.putForm('/api/businesses/' + encodeURIComponent(b._id), new FormData(e.target));
+        toast(res.message || 'Business updated.', 'success');
+        loadDetail(b._id);
+      } catch (err) { errEl.textContent = apiErrorMessage(err); errEl.classList.add('show'); }
+      finally { loadingBtn(btn, false); }
     });
   }
 });
