@@ -98,6 +98,7 @@ input,select,textarea{font-family:inherit;font-size:15px;color:var(--text)}
 /* Listing card buttons */
 .lc-btn-wa{background:#25d366;color:#fff;border:none;border-radius:8px;padding:7px 11px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px}
 .lc-btn-call{background:#eef3fb;color:var(--primary);border:1px solid #d6e3fb;border-radius:8px;padding:7px 11px;font-size:12.5px}
+.lc-phone-text{font-size:12px;font-weight:600;color:#1668e3;margin-left:6px}
 .lc-link{font-size:12.5px;color:var(--primary);font-weight:600}
 
 /* -------- Sections / page headers -------- */
