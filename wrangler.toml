@@ -1,0 +1,23 @@
+name = "changara-connect-api"
+main = "worker/index.js"
+compatibility_date = "2025-07-18"
+workers_dev = false
+
+[vars]
+ENVIRONMENT = "development"
+FRONTEND_URL = "http://localhost:8080"
+API_BASE_URL = "http://localhost:8787"
+SUPABASE_STORAGE_BUCKET = "uploads"
+
+[env.production]
+name = "changara-connect-api"
+routes = [{ pattern = "connect-api.startechafrica.co.ke", custom_domain = true }]
+
+[env.production.vars]
+ENVIRONMENT = "production"
+FRONTEND_URL = "https://startechafrica.co.ke"
+API_BASE_URL = "https://connect-api.startechafrica.co.ke"
+SUPABASE_STORAGE_BUCKET = "uploads"
+
+[triggers]
+crons = []

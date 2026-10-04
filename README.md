@@ -4,6 +4,14 @@
 
 A local marketplace and services platform for Changara and the surrounding areas of Teso North, Busia County, Kenya.
 
+## Cloudflare migration status
+
+The intended production topology is Cloudflare Pages at `https://startechafrica.co.ke/`, a Cloudflare Worker API at `https://connect-api.startechafrica.co.ke/`, and Supabase PostgreSQL/Storage. `client/` remains the static frontend.
+
+The migration is **not production-ready yet**: the Worker currently contains a health endpoint and explicit unimplemented responses, not replacements for the Express API route handlers. The Supabase schema and migration utility are preparatory and do not yet migrate all existing data or implement the application’s authentication, moderation, listing, search, and upload behavior. Keep the existing application available until those features are implemented and verified. `npm run validate` deliberately fails while these route handlers are missing. See [DEPLOYMENT.md](./DEPLOYMENT.md) for the exact Cloudflare setup and remaining blockers.
+
+The Express/MongoDB server and its dependencies are retained for legacy local use and historical data migration. They are not used by the Cloudflare Worker.
+
 - Discover local businesses, service providers, products, jobs, rentals, agricultural services, transport services, and community announcements.
 - Every listing has real CALL (`tel:`) and WHATSAPP (`wa.me`) buttons.
 - Every submission is saved to MongoDB, goes through admin approval, and appears publicly only when approved.
@@ -11,12 +19,14 @@ A local marketplace and services platform for Changara and the surrounding areas
 - Mobile-first, low-data, fast, secure.
 ---
 
-## Getting Started
+## Legacy local development (Express + MongoDB)
+
+This section documents the existing application only. It is not the production Cloudflare deployment path.
 
 ### Prerequisites
 
 - Node.js 18+ ([nodejs.org](https://nodejs.org))
-- MongoDB 6+ locally, a MongoDB Atlas cluster, or a Render-managed MongoDB
+- MongoDB 6+ for legacy local development
 - A terminal (PowerShell, Git Bash, or similar)
 - Git for version control
 
@@ -76,19 +86,19 @@ Or use MongoDB Atlas and paste the connection string into `MONGODB_URI`.
 
 ### 4. Run the application
 
-Development (with auto-restart):
+Legacy Express development (with auto-restart):
 
 ```bash
-npm run dev
+npm run dev:legacy
 ```
 
-Production:
+Legacy Express start (local/reference use only; not the Cloudflare production runtime):
 
 ```bash
 npm start
 ```
 
-Frontend and API are served from the same port:
+The legacy frontend and API are served from the same port:
 
 - Frontend: http://localhost:5000/
 - API: http://localhost:5000/api/...
@@ -108,7 +118,7 @@ node server/seed/seed-admin.js
 To fill the database with sample businesses, products, jobs, rentals, notices, and services for testing:
 
 ```bash
-npm run seed
+npm run legacy:seed
 ```
 
 The seed data is clearly marked as **DEMONSTRATION DATA**. It uses fictional business names such as:
@@ -140,7 +150,7 @@ On supported browsers, especially Chrome on Android, use the browser install pro
 
 ## Technology Stack
 
-| Layer | Technology |
+| Legacy implementation layer | Technology |
 |---|---|
 | Frontend | HTML5, CSS3, Vanilla JavaScript |
 | Icons | Font Awesome 6 |
@@ -150,9 +160,21 @@ On supported browsers, especially Chrome on Android, use the browser install pro
 | Authentication | JWT + bcrypt |
 | File uploads | Multer (stored in `server/uploads/`) |
 | PWA | `manifest.json` + `service-worker.js` |
-| Deployment | Render |
+| Deployment | Local/reference use only |
 
 No React, Angular, Vue, or other large frontend framework is used. The goal is a simple, fast, maintainable codebase that a single developer can understand and extend.
+
+### Production target
+
+| Layer | Target |
+|---|---|
+| Frontend | Cloudflare Pages at `https://startechafrica.co.ke/` |
+| API | Cloudflare Worker at `https://connect-api.startechafrica.co.ke/` |
+| Database | Supabase PostgreSQL |
+| File storage | Supabase Storage |
+| DNS | Cloudflare DNS |
+
+The target backend routes and data migration are not yet complete. See [DEPLOYMENT.md](./DEPLOYMENT.md) before attempting deployment.
 
 ---
 
@@ -382,5 +404,3 @@ Services are exposed as grouped views rather than a separate content type:
 - `GET /api/search?q=&type=&category=&location=&sort=`
 
 This endpoint searches across businesses, products, jobs, rentals, services, and notices.
-
-

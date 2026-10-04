@@ -3,7 +3,10 @@ node_modules/
 
 # Environment variables - never commit secrets
 .env
-.env.local
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
 
 # Uploaded files
 server/uploads/*
@@ -22,3 +25,11 @@ Thumbs.db
 
 # MongoDB local data
 data/
+
+# Cloudflare / build artifacts
+.wrangler/
+.draft/
+.supabase/
+
+# Local state
+*.local

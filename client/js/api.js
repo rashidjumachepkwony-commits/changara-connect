@@ -3,7 +3,17 @@
    Small fetch wrapper with JWT handling and friendly errors.
    ========================================================= */
 
-const API_BASE = ''; // Empty = same origin (works locally & on Render)
+const configuredApiBase = typeof window !== 'undefined'
+  ? (window.API_BASE_URL || window.__API_BASE__ || '')
+  : '';
+const isLocalHost = typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const isLegacyServerPort = typeof window !== 'undefined' && window.location.port === '5000';
+const API_BASE = configuredApiBase || (
+  isLocalHost
+    ? (isLegacyServerPort ? '' : 'http://localhost:8787')
+    : 'https://connect-api.startechafrica.co.ke'
+);
 
 const TOKEN_KEY = 'cc_token';
 const USER_KEY = 'cc_user';
