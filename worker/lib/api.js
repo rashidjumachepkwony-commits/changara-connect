@@ -89,6 +89,7 @@ export const normalizeRow = (table, row) => {
   if (result.entityType !== undefined) result.itemType = result.entityType;
   if (result.entityId !== undefined) result.itemId = result.entityId;
   if (table === 'reports' && result.details !== undefined) result.description = result.details;
+  if (table === 'products' && (result.title === undefined || result.title === null) && result.name) result.title = result.name;
   if (result.id) result._id = result.id;
   const ownerFields = {
     businesses: 'ownerId',

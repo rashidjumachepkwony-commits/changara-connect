@@ -124,13 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderDetail(p) {
+    const title = p.title || p.name;
     const box = document.getElementById('prodDetail');
-    const gallery = renderMediaGallery(getListingMedia(p), p.title);
-    const wb = buildWhatsAppLink(p.whatsapp || p.phone, 'Hello, I saw your item "' + p.title + '" on Changara Connect and I am interested.');
+    const gallery = renderMediaGallery(getListingMedia(p), title);
+    const wb = buildWhatsAppLink(p.whatsapp || p.phone, 'Hello, I saw your item "' + title + '" on Changara Connect and I am interested.');
     box.innerHTML =
       gallery +
       '<p class="lc-price">' + fmtKsh(p.price) + (p.negotiable ? ' <small class="text-muted">Negotiable</small>' : '') + '</p>' +
-      '<h3>' + esc(p.title) + '</h3>' +
+      '<h3>' + esc(title) + '</h3>' +
       '<p class="lc-sub"><i class="fa-solid fa-tag"></i> ' + esc(p.category) + ' &middot; <i class="fa-solid fa-location-dot"></i> ' + esc(p.location) + '</p>' +
       '<p class="lc-meta mt-1"><i class="fa-solid fa-rotate"></i> ' + esc(p.condition || '') + ' &middot; Posted ' + fmtDate(p.createdAt) + (p.seller && p.seller.name ? ' by ' + esc(p.seller.name) : '') + '</p>' +
       '<p class="mt-1">' + esc(p.description).replace(/\n/g, '<br>') + '</p>' +

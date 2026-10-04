@@ -18,6 +18,15 @@ const timeAgo = (iso) => { if (!iso) return ''; const mins = Math.floor((Date.no
 const toIntl = (number) => { const d = String(number || '').replace(/[^\d]/g, ''); if (d.length === 9) return '254' + d; if (d.length === 10 && d.startsWith('0')) return '254' + d.slice(1); if (d.length === 12 && d.startsWith('254')) return d; if (d.length === 11 && d.startsWith('0')) return '254' + d.slice(1); return d || null; };
 const buildWhatsAppLink = (number, message) => { const intl = toIntl(number); if (!intl) return '#'; const text = message || 'Hello, I found your listing on Changara Connect and I would like to know more.'; return 'https://wa.me/' + intl + '?text=' + encodeURIComponent(text); };
 const buildTelLink = (number) => { const intl = toIntl(number); return intl ? 'tel:+' + intl : '#'; };
+const formatPhoneForDisplay = (number) => {
+  if (!number) return '';
+  const d = String(number).replace(/[^\d]/g, '');
+  if (!d) return '';
+  if (d.length === 12 && d.startsWith('254')) { const local = '0' + d.slice(3); return local.slice(0, 4) + ' ' + local.slice(4, 7) + ' ' + local.slice(7); }
+  if (d.length === 10 && d.startsWith('0')) return d.slice(0, 4) + ' ' + d.slice(4, 7) + ' ' + d.slice(7);
+  if (d.length === 9) return d.slice(0, 4) + ' ' + d.slice(4);
+  return d;
+};
 
 /* Image fallback (low data: tiny local SVG) */
 const mediaSrc = (src) => { if (src && src.startsWith('/uploads')) return src; if (src && (src.startsWith('http://') || src.startsWith('https://'))) return src; return '/assets/images/placeholder.svg'; };
@@ -304,6 +313,7 @@ const renderBusinessCard = (b) =>
       '<p class="lc-sub"><i class="fa-solid fa-tag"></i> ' + esc(b.category) + ' &middot; <i class="fa-solid fa-location-dot"></i> ' + esc(b.location) + '</p>' +
       '<p class="lc-desc">' + esc(b.description) + '</p>' +
       '<div class="lc-foot">' +
+        (b.phone ? '<a class="lc-btn-call" href="' + buildTelLink(b.phone) + '"><i class="fa-solid fa-phone"></i> CALL ' + esc(formatPhoneForDisplay(b.phone)) + '</a>' : '') +
         (waLinkFor(b) ? '<a class="lc-btn-wa" href="' + waLinkFor(b) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>' : '') +
         '<a class="lc-link" href="business-details.html?id=' + b._id + '">View profile</a>' +
       '</div>' +
@@ -311,12 +321,13 @@ const renderBusinessCard = (b) =>
   '</div>';
 
 const renderProductCard = (p) => {
+  const title = p.title || p.name;
   const img = getListingMedia(p).find((asset) => asset.kind === 'image');
   return '<div class="card listing-card">' +
-    mediaBox('marketplace.html?id=' + p._id, img && img.url, p.title, p.featured ? '<span class="lc-tier">&#11088; FEATURED</span>' : '') +
+    mediaBox('marketplace.html?id=' + p._id, img && img.url, title, p.featured ? '<span class="lc-tier">&#11088; FEATURED</span>' : '') +
     '<div class="lc-body">' +
       '<p class="lc-price">' + fmtKsh(p.price) + (p.negotiable ? ' <small class="text-muted">Negotiable</small>' : '') + '</p>' +
-      '<h3 class="lc-title"><a href="marketplace.html?id=' + p._id + '">' + esc(p.title) + '</a></h3>' +
+      '<h3 class="lc-title"><a href="marketplace.html?id=' + p._id + '">' + esc(title) + '</a></h3>' +
       '<p class="lc-sub"><i class="fa-solid fa-tag"></i> ' + esc(p.category) + ' &middot; <i class="fa-solid fa-location-dot"></i> ' + esc(p.location) + '</p>' +
       '<div class="lc-foot"><span class="lc-meta"><i class="fa-solid fa-rotate"></i> ' + esc(p.condition || '') + '</span><span class="lc-meta"><i class="fa-regular fa-clock"></i> ' + timeAgo(p.createdAt) + '</span></div>' +
     '</div>' +
